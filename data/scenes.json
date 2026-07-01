@@ -1,0 +1,112 @@
+{
+  "_about": "Canonical data for the Token-Budget Slider demo. web/index.html embeds a copy of this so it runs offline by double-click. Accuracy values and the latency model are ILLUSTRATIVE (simulated mode) and clearly labeled as such in the UI; run data/eval_sweep.py to replace them with measured numbers on your own footage.",
+  "model": {
+    "id": "LiquidAI/LFM2.5-VL-450M",
+    "class": "Lfm2VlForConditionalGeneration (via AutoModelForImageTextToText, model_type lfm2_vl)",
+    "token_budget_param": "max_image_tokens",
+    "min_image_tokens": 64,
+    "documented_envelope": { "min": 64, "max": 256 },
+    "budget_stops": [64, 96, 128, 160, 192, 224, 256, 512],
+    "extended_stops": [512],
+    "image_token_id": 396,
+    "vision_encoder": "SigLIP2 NaFlex (base, ~86M), patch size 16, 2-layer MLP projector with pixel unshuffle (downsample factor 2)",
+    "token_resolution_examples": [
+      { "resolution": "256x384", "tokens": 96 },
+      { "resolution": "384x680", "tokens": 240 },
+      { "resolution": "1000x3000", "tokens": 1020 }
+    ],
+    "notes": "max_image_tokens is an image-processor kwarg (companion floor min_image_tokens); set at inference time, no retraining. 256 is the documented default max; raising it above 256 is supported (a single large image can reach ~1020 tokens). 512 is an extended, above-documented stop.",
+    "citations": [
+      { "claim": "Model class, model_type lfm2_vl, SigLIP2 encoder, patch/tile/downsample geometry, image_token_id 396, min_image_tokens 64 / max_image_tokens 256 defaults.", "url": "https://huggingface.co/LiquidAI/LFM2.5-VL-450M/raw/main/config.json" },
+      { "claim": "Model card: transformers v5.1+, native resolution up to 512x512, tiling for large images, user-tunable max image tokens and tile count for speed/quality without retraining.", "url": "https://huggingface.co/LiquidAI/LFM2.5-VL-450M" },
+      { "claim": "Token<->resolution mapping (256x384=>96 tokens, 384x680=>240, 1000x3000=>1020); tunable max image tokens controls effective input resolution.", "url": "https://www.liquid.ai/blog/lfm2-vl-efficient-vision-language-models" }
+    ]
+  },
+  "latency_model": {
+    "_note": "ILLUSTRATIVE, NOT a measured LFM2.5-VL benchmark. latency_ms = base + per_token*tokens + quad*tokens^2, on the reference laptop, times the device factor, plus small per-scene offset and per-drag jitter. Shape (flat-ish at low budget, rising at high) reflects prefill growing with vision tokens over a roughly fixed short decode.",
+    "base_ms": 220,
+    "per_token_ms": 0.9,
+    "quad_ms": 0.00025,
+    "jitter_pct": 0.03,
+    "reference_hardware": "Apple Silicon laptop (MPS, fp16) — assumed, not measured"
+  },
+  "device_presets": [
+    { "id": "laptop", "label": "This Mac · MPS", "factor": 1.0, "tag": "shape", "note": "Reference laptop. Shows the shape of the tradeoff, not a specific device's number." },
+    { "id": "jetson", "label": "Jetson Orin Nano", "factor": 2.2, "tag": "est.", "note": "Estimate. Runs on the board's CPU/GPU via PyTorch, NOT its NPU." },
+    { "id": "pi5", "label": "Raspberry Pi 5 · CPU", "factor": 6.0, "tag": "est.", "note": "Estimate. CPU only — no accelerator." },
+    { "id": "npu", "label": "Phone-class NPU", "factor": 0.5, "tag": "projected", "note": "PROJECTED. Requires a vendor runtime; this transformers/PyTorch build does not touch the NPU." }
+  ],
+  "prompt": "Describe the scene in one sentence.",
+  "scenes": [
+    {
+      "id": "package",
+      "label": "Package on step",
+      "ground_truth": "A parcel is on the porch step; no person present.",
+      "image": "data/scenes/package.jpg",
+      "latency_offset_ms": 0,
+      "levels": [
+        { "budget": 64,  "tokens": 64,  "correct": true, "accuracy": 0.80, "desc": "Something is sitting on the porch." },
+        { "budget": 96,  "tokens": 96,  "correct": true, "accuracy": 0.85, "desc": "An object is on the step near the door." },
+        { "budget": 128, "tokens": 128, "correct": true, "accuracy": 0.89, "desc": "A box or parcel is on the porch step." },
+        { "budget": 160, "tokens": 160, "correct": true, "accuracy": 0.92, "desc": "A cardboard package is sitting on the top step." },
+        { "budget": 192, "tokens": 192, "correct": true, "accuracy": 0.94, "desc": "A cardboard box is on the top step, just left of the door." },
+        { "budget": 224, "tokens": 224, "correct": true, "accuracy": 0.96, "desc": "A medium cardboard package sits on the top step, to the left of the welcome mat." },
+        { "budget": 256, "tokens": 256, "correct": true, "accuracy": 0.97, "desc": "A medium cardboard parcel sits on the top step, left of the mat; a shipping label is visible on top." },
+        { "budget": 512, "tokens": 512, "correct": true, "accuracy": 0.98, "desc": "A medium cardboard parcel sits on the top step, left of the welcome mat, a shipping label facing up; no person is in frame." }
+      ]
+    },
+    {
+      "id": "person",
+      "label": "Person at door",
+      "ground_truth": "One person standing at the front door.",
+      "image": "data/scenes/person.jpg",
+      "latency_offset_ms": 10,
+      "levels": [
+        { "budget": 64,  "tokens": 64,  "correct": true, "accuracy": 0.70, "desc": "A person may be near the door." },
+        { "budget": 96,  "tokens": 96,  "correct": true, "accuracy": 0.78, "desc": "A person is at the door." },
+        { "budget": 128, "tokens": 128, "correct": true, "accuracy": 0.84, "desc": "A person is standing at the front door." },
+        { "budget": 160, "tokens": 160, "correct": true, "accuracy": 0.89, "desc": "One person stands at the front door, facing it." },
+        { "budget": 192, "tokens": 192, "correct": true, "accuracy": 0.92, "desc": "One adult stands at the front door, facing the door, a hand near the handle." },
+        { "budget": 224, "tokens": 224, "correct": true, "accuracy": 0.94, "desc": "One adult in a dark jacket stands at the front door, facing it." },
+        { "budget": 256, "tokens": 256, "correct": true, "accuracy": 0.95, "desc": "One adult in a dark jacket stands at the door, facing it, appears to be pressing the doorbell." },
+        { "budget": 512, "tokens": 512, "correct": true, "accuracy": 0.96, "desc": "A single adult in a dark jacket stands at the front door, facing it, a hand raised toward the doorbell; no package visible." }
+      ]
+    },
+    {
+      "id": "two-people",
+      "label": "Two people",
+      "ground_truth": "Two people at the door.",
+      "image": "data/scenes/two-people.jpg",
+      "latency_offset_ms": 25,
+      "breaks_below_budget": 128,
+      "levels": [
+        { "budget": 64,  "tokens": 64,  "correct": false, "accuracy": 0.45, "desc": "A person is at the door." },
+        { "budget": 96,  "tokens": 96,  "correct": false, "accuracy": 0.58, "desc": "One, possibly two people near the door." },
+        { "budget": 128, "tokens": 128, "correct": true,  "accuracy": 0.78, "desc": "Two people appear to be at the door." },
+        { "budget": 160, "tokens": 160, "correct": true,  "accuracy": 0.86, "desc": "Two people stand at the front door." },
+        { "budget": 192, "tokens": 192, "correct": true,  "accuracy": 0.90, "desc": "Two adults stand at the front door, side by side." },
+        { "budget": 224, "tokens": 224, "correct": true,  "accuracy": 0.93, "desc": "Two adults stand at the front door, one slightly behind the other." },
+        { "budget": 256, "tokens": 256, "correct": true,  "accuracy": 0.94, "desc": "Two adults at the door; one in front facing the door, one behind holding a phone." },
+        { "budget": 512, "tokens": 512, "correct": true,  "accuracy": 0.95, "desc": "Two adults at the front door — one in a light top facing the door, a second in darker clothing standing just behind to the right." }
+      ]
+    },
+    {
+      "id": "empty-branch",
+      "label": "Empty porch (branch)",
+      "ground_truth": "Empty porch; a tree branch is moving. No person or package.",
+      "image": "data/scenes/empty-branch.jpg",
+      "latency_offset_ms": -5,
+      "breaks_below_budget": 160,
+      "levels": [
+        { "budget": 64,  "tokens": 64,  "correct": false, "accuracy": 0.40, "desc": "A person appears to be standing near the door." },
+        { "budget": 96,  "tokens": 96,  "correct": false, "accuracy": 0.50, "desc": "Someone may be at the edge of the porch." },
+        { "budget": 128, "tokens": 128, "correct": false, "accuracy": 0.62, "desc": "Possibly a figure near the railing, or foliage." },
+        { "budget": 160, "tokens": 160, "correct": true,  "accuracy": 0.82, "desc": "The porch looks empty; some movement at the edge of the frame." },
+        { "budget": 192, "tokens": 192, "correct": true,  "accuracy": 0.89, "desc": "The porch is empty; a plant or branch is moving near the railing." },
+        { "budget": 224, "tokens": 224, "correct": true,  "accuracy": 0.93, "desc": "The porch is empty; a tree branch is swaying at the left edge of the frame." },
+        { "budget": 256, "tokens": 256, "correct": true,  "accuracy": 0.95, "desc": "No person on the porch; a tree branch moves at the left edge, casting a shifting shadow." },
+        { "budget": 512, "tokens": 512, "correct": true,  "accuracy": 0.96, "desc": "The porch is empty — no person or package. A tree branch sways at the left edge of the frame, and its shadow moves across the step." }
+      ]
+    }
+  ]
+}

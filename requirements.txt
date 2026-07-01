@@ -1,0 +1,14 @@
+# Backend for the LFM2.5-VL-450M local demo (Mode B — real model).
+#
+# transformers is a HARD floor: the lfm2_vl model module (Lfm2VlForConditionalGeneration,
+# loaded via AutoModelForImageTextToText) is absent in older releases, so it MUST be
+# >= 4.57.0. Liquid's current model card recommends transformers v5.1+; if the model
+# fails to load on 4.57–5.0, run:  pip install -U transformers
+transformers>=4.57.0
+torch
+torchvision
+accelerate
+pillow
+fastapi
+uvicorn
+huggingface_hub

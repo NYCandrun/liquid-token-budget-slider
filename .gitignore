@@ -1,0 +1,18 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Hugging Face model cache (downloaded on first real-model run)
+.cache/
+hf_cache/
+
+# Your dropped-in footage is fine to commit, but ignore large scratch frames
+data/scenes/_scratch/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
