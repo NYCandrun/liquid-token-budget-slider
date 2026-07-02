@@ -148,13 +148,7 @@
     background:#FCF3E6;border:1px solid #F1D9B5;padding:2px 8px;border-radius:6px;margin-left:8px}
   .exttag.show{display:inline-block}
 
-  .devicerow{margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
-  .devicerow label{font-family:var(--tech);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-500)}
-  select{font:inherit;font-size:.86rem;background:var(--white);color:var(--ink-900);
-    border:1px solid var(--rule);border-radius:8px;padding:7px 11px}
-  .devnote{font-size:.78rem;color:var(--ink-500);flex:1 1 240px;min-width:200px}
-  .devnote b{color:var(--violet-700);font-weight:600}
-  .liverow{margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+  .liverow{margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
   .livebtn{font-family:var(--sans);font-size:.84rem;font-weight:600;cursor:pointer;background:var(--violet-600);
     color:#fff;border:1px solid var(--violet-600);border-radius:999px;padding:9px 18px;white-space:normal;transition:.15s}
   .livebtn:hover{background:var(--violet-700);border-color:var(--violet-700)}
@@ -221,11 +215,6 @@
         <div class="ticks" id="ticks"></div>
         <div class="budgetline">Budget cap: <b id="budgetVal">256</b> vision tokens
           <span class="exttag" id="extTag">extended · above documented max 256</span>
-        </div>
-        <div class="devicerow">
-          <label for="device">Rescale latency to</label>
-          <select id="device"></select>
-          <span class="devnote" id="devNote"></span>
         </div>
         <div class="liverow">
           <button id="liveBtn" class="livebtn">▶ Use the live model</button>
@@ -308,12 +297,6 @@ const DATA = {
   },
   latency: { base: 220, perToken: 0.9, quad: 0.00025 },
   cost: { floor: 40 },   // fixed per-frame overhead (token-equivalent) for compute/energy/memory
-  devices: [
-    { id:"laptop", label:"This Mac · MPS", factor:1.0, tag:"shape",     note:"Reference laptop. Shows the <b>shape</b> of the tradeoff, not a device's number." },
-    { id:"jetson", label:"Jetson Orin Nano", factor:2.2, tag:"est.",    note:"Estimate. Runs on the board's CPU/GPU via PyTorch — <b>not</b> its NPU." },
-    { id:"pi5",    label:"Raspberry Pi 5 · CPU", factor:6.0, tag:"est.", note:"Estimate. CPU only — no accelerator." },
-    { id:"npu",    label:"Phone-class NPU", factor:0.5, tag:"projected", note:"<b>Projected.</b> Needs a vendor runtime; this transformers build never touches the NPU." }
-  ],
   // Real-mode prompt: ask the model for the structured event directly.
   eventPrompt: 'You are a home-camera event detector. Look at the front doorstep and respond with ONLY a JSON object and nothing else: {"event":"<snake_case>","where":"<location>","conf":<0.0-1.0>}.',
   scenes: [
@@ -358,15 +341,14 @@ const DATA = {
 
 const STOPS = DATA.model.budget_stops;
 const $ = (id) => document.getElementById(id);
-const state = { scene: 0, budget: 6, device: 0, mode: "sim" };
+const state = { scene: 0, budget: 6, mode: "sim" };
 
-/* ---------- illustrative latency model ---------- */
+/* ---------- illustrative latency model (reference laptop) ---------- */
 function latencyMs(scene, idx){
   const t = STOPS[idx], L = DATA.latency;
   const raw = L.base + L.perToken * t + L.quad * t * t + scene.off;
-  const factor = DATA.devices[state.device].factor;
   const jitter = 1 + 0.025 * Math.sin(state.scene * 2.3 + idx * 1.7);  // deterministic, no flicker
-  return Math.round(raw * factor * jitter);
+  return Math.round(raw * jitter);
 }
 
 /* ---------- cost model: per-frame compute/energy ∝ vision tokens (+ fixed floor) ---------- */
@@ -477,8 +459,6 @@ function render(){
   applyCoarsen(idx);
   renderCurve(scene, idx);
   document.querySelectorAll("#ticks span").forEach((s,i)=>s.classList.toggle("on", i===idx));
-  const dev=DATA.devices[state.device];
-  $("devNote").innerHTML=`<b>${dev.tag}</b> — ${dev.note}`;
 
   if(state.mode==="real") scheduleInfer();
 }
@@ -495,9 +475,6 @@ function buildUI(){
     tabs.appendChild(b);
   });
   $("ticks").innerHTML=STOPS.map(s=>`<span>${s}</span>`).join("");
-  const sel=$("device");
-  DATA.devices.forEach((d,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=`${d.label} (${d.tag})`; sel.appendChild(o); });
-  sel.onchange=()=>{ state.device=+sel.value; render(); };
   $("facts").innerHTML=DATA.model.token_resolution_examples.map(e=>`${e.resolution}px&nbsp;→&nbsp;<b style="color:#18181B">${e.tokens}</b>&nbsp;tokens`).join("<br>");
   $("cites").innerHTML=DATA.model.citations.map(c=>`· <a href="${c.url}" target="_blank" rel="noopener">${c.t}</a>`).join("<br>");
   const sl=$("slider"); sl.value=state.budget;
