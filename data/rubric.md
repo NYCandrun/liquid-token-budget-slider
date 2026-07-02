@@ -2,7 +2,7 @@
 
 The demo's curve is **description detail** vs. token budget — how complete and specific
 the model's caption is — **not** a pass/fail accuracy. We checked on the real model
-(see `../modal_app.py`): this 450M model gets the scene *right* at every budget on these
+(run locally — see `../server.py`): this 450M model gets the scene *right* at every budget on these
 clear frames; what the token budget changes is the level of **detail**. Detection,
 counting, and OCR were all too noisy to score as a clean accuracy curve (the model
 hallucinates label text and detects the tiny parcel inconsistently), so detail is the

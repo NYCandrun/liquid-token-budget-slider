@@ -148,11 +148,7 @@
     background:#FCF3E6;border:1px solid #F1D9B5;padding:2px 8px;border-radius:6px;margin-left:8px}
   .exttag.show{display:inline-block}
 
-  .liverow{margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
-  .livebtn{font-family:var(--sans);font-size:.84rem;font-weight:600;cursor:pointer;background:var(--violet-600);
-    color:#fff;border:1px solid var(--violet-600);border-radius:999px;padding:9px 18px;white-space:normal;transition:.15s}
-  .livebtn:hover{background:var(--violet-700);border-color:var(--violet-700)}
-  .livebtn:disabled{opacity:.7;cursor:default}
+  .liverow{margin-top:16px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
   .livenote{font-size:.74rem;color:var(--ink-500);flex:1 1 300px;min-width:220px}
   .livenote b{color:var(--ink-900)}
 
@@ -220,8 +216,7 @@
           <span class="exttag" id="extTag">extended · above documented max 256</span>
         </div>
         <div class="liverow">
-          <button id="liveBtn" class="livebtn">▶ Use the live model</button>
-          <span class="livenote">Runs the real LFM2.5-VL-450M on Modal. Real JSON &amp; token counts — but the raw model's event/confidence aren't yet reliable (that's the fine-tune), and latency is cloud + network, <b>not</b> on-device.</span>
+          <span class="livenote"><b>Live model runs locally.</b> Run <code>server.py</code> on your machine and open the page it serves — it auto-detects the local server and swaps in the real LFM2.5-VL-450M (real JSON &amp; token counts). No server means simulated numbers; there is no hosted/cloud endpoint.</span>
         </div>
       </div>
     </section>
@@ -263,7 +258,7 @@
       <div>
         <h4>What's real, what's illustrative</h4>
         <ul class="honest">
-          <li><b>Real</b> — vision-token counts (exact), and live-mode latency (cloud GPU + network, <b>not</b> on-device).</li>
+          <li><b>Real</b> — vision-token counts (exact), and in live mode the latency measured on the machine running the local server.</li>
           <li><b>Modeled</b> — compute, memory &amp; energy per frame; they scale with the token count.</li>
           <li><b>Illustrative</b> — the event + confidence in simulated mode (a <em>fine-tuned</em> target). The live model returns valid JSON but a noisy event/conf — locking that in is the fine-tune.</li>
         </ul>
@@ -398,7 +393,7 @@ function renderEventReal(raw){          // live: the raw model's actual (noisy) 
     $("eventCard").textContent = raw;   // couldn't parse — show it raw
     $("evByte").textContent = "~" + txt.length + " B";
   }
-  $("evMode").textContent = "raw model output · " + (SERVER_KIND==="cloud" ? "Modal" : "local");
+  $("evMode").textContent = "raw model output · local";
   $("evMode").style.color = "var(--warning)";
   $("evFlag").textContent = "· not yet reliable — fine-tune to lock the event + calibrate conf";
 }
@@ -486,16 +481,13 @@ function buildUI(){
   $("cites").innerHTML=DATA.model.citations.map(c=>`· <a href="${c.url}" target="_blank" rel="noopener">${c.t}</a>`).join("<br>");
   const sl=$("slider"); sl.value=state.budget;
   sl.addEventListener("input",()=>{ state.budget=+sl.value; render(); });
-  const lb=$("liveBtn"); if(lb) lb.onclick=connectLive;
 }
 
-/* ---------- real-model mode ---------- */
-// Hosted model on Modal so the demo can run a live model on demand. Modal is a CLOUD GPU:
-// real JSON + real vision-token counts, but latency is cloud + network, NOT on-device. We do
-// NOT auto-connect on load (a cold start spins up a GPU — cost + ~40s); the hosted model is
-// opt-in via the button, while a same-origin local server (server.py) auto-connects.
-const MODEL_ENDPOINT = "https://jacobnikolau767--lfm2-vl-450m-demo-model-web.modal.run";
-let inferTimer=null, inferSeq=0, SERVER_BASE=null, SERVER_KIND=null;
+/* ---------- real-model mode (LOCAL ONLY) ---------- */
+// The live model runs ONLY against a same-origin local server (server.py on localhost): real
+// JSON + real vision-token counts, measured on your own machine. There is no hosted/cloud
+// endpoint — the public demo has no server, so it always runs simulated.
+let inferTimer=null, inferSeq=0, SERVER_BASE=null;
 function baseURL(){ return SERVER_BASE; }
 function scheduleInfer(){ clearTimeout(inferTimer); inferTimer=setTimeout(runInfer, 160); }
 
@@ -528,28 +520,24 @@ async function runInfer(){
     $("descVal").textContent=j.description;
   }catch(e){
     if(seq!==inferSeq) return;
-    SERVER_BASE=null; SERVER_KIND=null; setMode("sim"); render();   // server went away → simulated
+    SERVER_BASE=null; setMode("sim"); render();   // server went away → simulated
   }
 }
 
 function setMode(mode, device){
   state.mode=mode;
-  const b=$("modeBadge"), btn=$("liveBtn");
+  const b=$("modeBadge");
   if(mode==="real"){
-    const cloud = SERVER_KIND==="cloud";
     b.className="badge live";
-    b.innerHTML='<span class="dot"></span>'+(cloud?"LIVE · Modal":"LIVE · local")+(device?" · "+device:"");
+    b.innerHTML='<span class="dot"></span>LIVE · local'+(device?" · "+device:"");
     $("curveLabel").textContent="confidence illustrative · cost ∝ tokens";
     $("tokSub").textContent="measured · "+(device||"");
-    $("latSub").textContent = cloud ? "cloud GPU + network — not on-device"
-                                    : "measured locally — shape, not a device number";
-    if(btn) btn.style.display="none";
+    $("latSub").textContent="measured locally — shape, not a device number";
   }else{
     b.className="badge sim"; b.innerHTML='<span class="dot"></span>SIMULATED';
     $("curveLabel").textContent="illustrative";
     $("tokSub").textContent="modeled";
     $("latSub").textContent="illustrative";
-    if(btn){ btn.style.display=""; btn.disabled=false; btn.textContent="▶ Use the live model"; }
   }
 }
 
@@ -564,20 +552,12 @@ async function probe(base, timeoutMs){
 }
 async function initMode(){
   // Auto-connect only to a same-origin local server (server.py at localhost:8000) — cheap,
-  // instant. The hosted Modal model is opt-in (button) so we don't cold-start a GPU per visitor.
+  // instant. No cloud fallback: the public demo has no server, so it stays simulated.
   if(location.protocol.startsWith("http")){
     const h=await probe(location.origin, 3000);
-    if(h){ SERVER_BASE=location.origin; SERVER_KIND="local"; setMode("real", h.device); render(); return; }
+    if(h){ SERVER_BASE=location.origin; setMode("real", h.device); render(); return; }
   }
   setMode("sim");
-}
-async function connectLive(){
-  const btn=$("liveBtn");
-  if(btn){ btn.disabled=true; btn.textContent="waking the model… (~40s)"; }
-  const h=await probe(MODEL_ENDPOINT, 90000);   // first hit spins up a T4 + loads weights
-  if(h){ SERVER_BASE=MODEL_ENDPOINT; SERVER_KIND="cloud"; setMode("real", h.device); render(); }
-  else { SERVER_BASE=null; SERVER_KIND=null; setMode("sim");
-    if(btn){ btn.disabled=false; btn.textContent="▶ retry — couldn't reach it"; } }
 }
 
 /* ---------- boot ---------- */

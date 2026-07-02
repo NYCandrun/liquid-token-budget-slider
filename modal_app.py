@@ -1,24 +1,28 @@
 """
-modal_app.py — host LFM2.5-VL-450M as an HTTPS web endpoint on Modal.
+modal_app.py — OPTIONAL self-host of LFM2.5-VL-450M as an HTTPS web endpoint on Modal.
 
-This gives the demo a real, always-reachable model backend so the public GitHub Pages
-site can call a live model (clean HTTPS + CORS — no localhost/CORS/Private-Network mess).
+NOT USED BY THE DEMO AND NOT DEPLOYED BY DEFAULT. The demo is **local-only**: the live model
+runs against server.py on your own machine, and the public GitHub Pages site always runs in
+simulated mode. This file is kept only as an optional recipe if you deliberately want to
+self-host on a cloud GPU.
+
+SECURITY WARNING: as written this deploys a **public, UNAUTHENTICATED** GPU endpoint
+(ALLOW_ORIGINS = "*"). Anyone who discovers the *.modal.run URL can invoke it and burn
+GPU-seconds billed to your Modal account (a "denial of wallet"). A public, no-signup demo
+cannot hide an auth token in its client JS, so if you do deploy this: set a Modal spend limit,
+cap autoscaling (max_containers), and prefer taking it down (`modal app stop <name>`) when not
+actively demoing. That is exactly why the demo does not use it.
 
 HONESTY NOTE: this runs on a **cloud GPU**, which is the opposite of the demo's on-device
 thesis. It produces real captions, real vision-token counts, and the real
 budget -> tokens -> detection behaviour — but the latency it reports is cloud GPU + network,
-NOT the edge/on-device latency the product story is about. The UI labels this "cloud".
+NOT the edge/on-device latency the product story is about.
 
-Endpoints (same contract as server.py, so the web app is unchanged):
+Endpoints (same contract as server.py):
   GET  /health -> {status, model_loaded, device}
   POST /infer  -> {image_b64, prompt, max_image_tokens} -> {description, latency_ms, vision_tokens, device}
 
-Deploy:  modal deploy modal_app.py
-Then set MODEL_ENDPOINT in web/index.html to the printed *.modal.run URL.
-
-Cost: scales to zero when idle (no cost); a T4 spins up on the first request (cold start
-downloads nothing — weights are baked into the image). CORS is open ("*") so anyone with
-the URL can invoke it — lock ALLOW_ORIGINS to your Pages origin if you care about that.
+Deploy (only if you accept the warning above):  modal deploy modal_app.py
 """
 import base64
 import io

@@ -39,7 +39,7 @@
   "caption_prompt": "Describe the scene in one sentence.",
   "event_prompt": "You are a home-camera event detector. Look at the front doorstep and respond with ONLY a JSON object and nothing else: {\"event\":\"<snake_case>\",\"where\":\"<location>\",\"conf\":<0.0-1.0>}.",
   "cost": { "_note": "Per-frame compute, activation memory and energy scale with the vision-token count (plus a fixed floor). Modeled/relative in the UI, not absolute joules. cost% = 100*(floor_tokens+tokens)/(floor_tokens+512).", "floor_tokens": 40 },
-  "_scene_note": "The demo emits a structured EVENT {event, where, conf} that a control loop acts on, and shows per-frame COST (compute/memory/energy scale with vision tokens). The event + 'conf' here are an ILLUSTRATIVE fine-tuned target; the raw 450M model (real mode via modal_app.py) returns valid JSON but noisy events — fine-tune to make them reliable. 'desc' is the caption the model would give ('what it saw'); 'conf' (0..1) is the illustrative event confidence, rising then plateauing with budget.",
+  "_scene_note": "The demo emits a structured EVENT {event, where, conf} that a control loop acts on, and shows per-frame COST (compute/memory/energy scale with vision tokens). The event + 'conf' here are an ILLUSTRATIVE fine-tuned target; the raw 450M model (real mode via server.py, run locally) returns valid JSON but noisy events — fine-tune to make them reliable. 'desc' is the caption the model would give ('what it saw'); 'conf' (0..1) is the illustrative event confidence, rising then plateauing with budget.",
   "scenes": [
     {
       "id": "package",

@@ -8,7 +8,7 @@ You'll see, as you drag the budget:
 - an **event-confidence vs cost** curve (the sweet spot is the fewest tokens past the confidence elbow),
 - and the caption — "what the model saw".
 
-Honesty up front: in **simulated** mode the event + confidence are an *illustrative fine-tuned target*. Click **Use the live model** and the raw LFM2.5-VL-450M (on Modal) returns valid JSON but a **noisy** event/confidence — locking those in is a fine-tune. Vision-token counts are exact and compute/memory/energy scale with them.
+Honesty up front: in **simulated** mode the event + confidence are an *illustrative fine-tuned target*. Run the model locally (see [Try it](#try-it)) and the raw LFM2.5-VL-450M returns valid JSON but a **noisy** event/confidence — locking those in is a fine-tune. Vision-token counts are exact and compute/memory/energy scale with them.
 
 ---
 
@@ -28,9 +28,9 @@ Honesty up front: in **simulated** mode the event + confidence are an *illustrat
    ```
 3. **Open [http://localhost:8000](http://localhost:8000).** The page detects the running server and switches to the **LIVE MODEL** automatically — in Chrome on a Mac, and in any other browser, with no configuration. Drop your own frames into `data/scenes/` to run the model on real footage.
 
-**No install at all?** On the demo, click **"Use the live model"** to run the real model on a hosted **Modal** endpoint (cloud GPU) — see [`modal_app.py`](modal_app.py) (`modal deploy modal_app.py`). Real captions and token counts; it's a cloud GPU so the latency is cloud + network, **not** on-device, and it's opt-in (it only spins a GPU up when you ask, and scales to zero when idle).
+**The live model is local-only.** There is no hosted/cloud endpoint, so the public demo link always runs in **simulated** mode — to see the real model, run `server.py` on your own machine (above). *(The repo keeps an optional [`modal_app.py`](modal_app.py) if you ever want to self-host on a cloud GPU, but deploying it publishes a **public, unauthenticated** GPU endpoint billed to your account, so it is left undeployed — see the warning at the top of that file.)*
 
-> The app is a single page: **`web/index.html`** is the entry point (the `index.html` at the repo root just redirects to it), and `server.py` serves it at `http://localhost:8000`. The public link above is the shareable **simulated** demo; the live model runs locally, or on Modal via the button.
+> The app is a single page: **`web/index.html`** is the entry point (the `index.html` at the repo root just redirects to it), and `server.py` serves it at `http://localhost:8000`. The public link above is the shareable **simulated** demo; the live model runs locally via `server.py`.
 
 ---
 
@@ -106,7 +106,7 @@ data/scenes/small-parcel.jpg   # a small parcel at the door
 data/scenes/two-parcels.jpg    # a box + a small parcel
 ```
 
-They drive the three demo scenes. The token budget doesn't change *whether* the model sees the package — a 450M model gets these clear frames right at any budget — it changes the **per-frame cost** (fewer tokens → less compute, memory, energy, latency) and how confident/complete the read is. That framing was verified against the real model on Modal — see [`modal_app.py`](modal_app.py); detection/counting/OCR were too noisy on a 450M model to fake a clean "it breaks at low budget" story. Replace any of these (keep the filenames) with **your own** doorbell frames and reload. The event, confidence and cost curve in simulated mode are **illustrative**; in real-model mode the event comes from the actual model (and is where the fine-tune matters).
+They drive the three demo scenes. The token budget doesn't change *whether* the model sees the package — a 450M model gets these clear frames right at any budget — it changes the **per-frame cost** (fewer tokens → less compute, memory, energy, latency) and how confident/complete the read is. That framing was verified by running the real model locally — see [`server.py`](server.py); detection/counting/OCR were too noisy on a 450M model to fake a clean "it breaks at low budget" story. Replace any of these (keep the filenames) with **your own** doorbell frames and reload. The event, confidence and cost curve in simulated mode are **illustrative**; in real-model mode the event comes from the actual model (and is where the fine-tune matters).
 
 ---
 

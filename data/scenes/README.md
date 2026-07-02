@@ -2,7 +2,7 @@
 
 The demo ships with three real front-door / doorbell-camera frames (all from one fixed
 camera). The token budget changes how much **detail** the model's description has, not
-whether it's correct (verified on the real model — see `../../modal_app.py`):
+whether it's correct (verified on the real model, run locally — see `../../server.py`):
 
 | file | scene | low budget → high budget |
 |---|---|---|
