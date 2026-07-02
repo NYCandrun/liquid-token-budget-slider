@@ -11,6 +11,26 @@ with an **accuracy-vs-budget curve** behind it showing where quality holds and w
 
 ---
 
+## Try it
+
+**Live demo (no install):** **[nycandrun.github.io/liquid-token-budget-slider](https://nycandrun.github.io/liquid-token-budget-slider/)** — opens in any browser and runs in **simulated** mode (clearly badged), so you can drag the slider and feel the tradeoff immediately. Nothing is installed; nothing leaves your machine.
+
+**Run the real model (the app auto-connects to it):**
+
+1. **Download this repo** — `git clone https://github.com/NYCandrun/liquid-token-budget-slider` (or download the ZIP and unzip).
+2. **Set up and start the server** (full steps in [Quick start B](#quick-start-b--real-model-runs-on-your-mac-on-localhost)):
+   ```bash
+   cd liquid-token-budget-slider
+   python3 -m venv .venv && source .venv/bin/activate
+   pip install -r requirements.txt
+   python server.py
+   ```
+3. **Open [http://localhost:8000](http://localhost:8000).** The page detects the running server and switches to the **LIVE MODEL** automatically — in Chrome on a Mac, and in any other browser, with no configuration. Drop your own frames into `data/scenes/` to run the model on real footage.
+
+> The app is a single page: **`web/index.html`** is the entry point (the `index.html` at the repo root just redirects to it), and `server.py` serves it at `http://localhost:8000`. The public link above is the shareable **simulated** demo; the live model runs locally on your machine.
+
+---
+
 ## Two ways to run
 
 **Mode A — Simulated (no installation).** Just open the demo in a browser. It uses realistic, clearly-labeled illustrative numbers and scene descriptions instead of running the real model. Works offline, opens in seconds, nothing to install. Use this to see and present the demo quickly. A "SIMULATED" badge is always visible in this mode so no one mistakes the illustrative numbers for a measured benchmark.
