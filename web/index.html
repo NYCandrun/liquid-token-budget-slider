@@ -159,6 +159,9 @@
   footer{margin-top:28px;border-top:1px solid var(--rule);padding-top:18px;font-size:.8rem;color:var(--ink-500)}
   footer h4{margin:0 0 7px;font-family:var(--tech);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-900);font-weight:600}
   footer p{margin:0 0 10px;max-width:70ch}
+  footer ul.honest{margin:0 0 12px;padding-left:0;list-style:none;max-width:70ch}
+  footer ul.honest li{margin:0 0 7px;padding-left:14px;position:relative}
+  footer ul.honest li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;background:var(--violet-400);border-radius:1px}
   footer b{color:var(--ink-900);font-weight:600}
   footer .cols{display:grid;grid-template-columns:1fr 1fr;gap:28px}
   @media (max-width:680px){footer .cols{grid-template-columns:1fr}}
@@ -259,8 +262,12 @@
     <div class="cols">
       <div>
         <h4>What's real, what's illustrative</h4>
-        <p>The <b>event</b> and its confidence in <b>simulated</b> mode are an <b>illustrative target</b> — what a model <em>fine-tuned</em> for your event taxonomy would emit. Click <b>Use the live model</b> and the raw LFM2.5-VL-450M runs on Modal: it returns structurally-valid JSON, but the event label and confidence are <b>not yet reliable</b> — locking those in is the fine-tune. Vision-token counts are exact; <b>compute, memory and energy per frame scale with them</b> (modeled). Latency is real in live mode (cloud GPU + network, not on-device) and illustrative in simulated mode.</p>
-        <p>The token budget is a first-class control in LFM2.5-VL (<code>max_image_tokens</code>, set per inference, no retraining). Fewer tokens → less to encode and prefill → less compute, memory and energy — the lever for fitting a camera's perception into a device's power and latency envelope.</p>
+        <ul class="honest">
+          <li><b>Real</b> — vision-token counts (exact), and live-mode latency (cloud GPU + network, <b>not</b> on-device).</li>
+          <li><b>Modeled</b> — compute, memory &amp; energy per frame; they scale with the token count.</li>
+          <li><b>Illustrative</b> — the event + confidence in simulated mode (a <em>fine-tuned</em> target). The live model returns valid JSON but a noisy event/conf — locking that in is the fine-tune.</li>
+        </ul>
+        <p>The token budget is a first-class LFM2.5-VL control (<code>max_image_tokens</code>, per inference, no retraining): fewer tokens → less to encode and prefill → less compute, memory and energy.</p>
       </div>
       <div>
         <h4>Token ↔ resolution (Liquid AI)</h4>
