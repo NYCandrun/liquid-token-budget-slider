@@ -1,18 +1,18 @@
-# Drop your footage here
+# Scene frames
 
-The demo loads one image per scene from this folder. Add your doorbell frames with
-these exact names (`.jpg` or `.png`) and reload the page — they appear automatically:
+The demo ships with three real front-door / doorbell-camera frames (all from one fixed
+camera). The token budget changes how much **detail** the model's description has, not
+whether it's correct (verified on the real model — see `../../modal_app.py`):
 
-```
-package.jpg        # a package left on the step (no person)
-person.jpg         # one person at the door
-two-people.jpg     # two people at the door
-empty-branch.jpg   # empty porch, a branch moving (the tricky false-positive scene)
-```
+| file | scene | low budget → high budget |
+|---|---|---|
+| `package.jpg`      | Box on step  | "a box on the step" → materials, colour, the potted plant |
+| `small-parcel.jpg` | Small parcel | "a white item" → "a small white padded parcel on the black doormat" |
+| `two-parcels.jpg`  | Two parcels  | mentions the box → adds the second small parcel and surroundings |
 
-Until a file is present, that scene shows a clearly-marked placeholder frame; the
-slider, readouts, and accuracy curve still work (in simulated mode). For a real
-measured accuracy curve, add a labeled set (~20–40 frames) and run `../eval_sweep.py`
-with the server running — see `../rubric.md`.
+These are public-domain (CC0) — see [`SOURCES.md`](SOURCES.md).
 
-No footage is shipped in this repo, so nothing here is copyrighted to anyone but you.
+**Bring your own footage:** replace any of these `.jpg`s (keep the filenames) with your own
+doorbell frames and reload — they appear automatically. To add scenes, edit the `DATA.scenes`
+array in `web/index.html` and `data/scenes.json`. For a real measured accuracy curve, add a
+labeled set and run `../eval_sweep.py` with the server running — see `../rubric.md`.

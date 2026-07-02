@@ -1,13 +1,14 @@
 # Token-Budget Slider Demo
 
-An interactive demo for **LFM2.5-VL-450M**, a small vision-language model from Liquid AI that can run on-device. The model can turn a picture into a written description, and it has an unusual, first-class knob: you can choose **how many "vision tokens"** it spends looking at each image, at inference time, without retraining. Fewer tokens = faster but less detailed; more tokens = slower but sharper. This demo puts that knob on a slider so you can drag it and watch the tradeoff happen live on a doorbell scene.
+An interactive demo for **LFM2.5-VL-450M**, a small on-device vision-language model from Liquid AI. It turns a front-door camera frame into a **structured event** a control loop can act on — `{"event":"package_placed","where":"front_door","conf":0.9}` — and puts the model's **vision-token budget** on a slider. The point: **fewer vision tokens = less compute, memory and energy per frame**, so you dial the fewest tokens that still gets the event. (Companion to the "cameras as a sensor" control-loop one-pager.)
 
-You'll see, as you drag:
-- the model's **description** of the scene,
-- the **latency** (how long it took), and
-- the **vision-token count** it actually used,
+You'll see, as you drag the budget:
+- the **structured event** the camera emits — front and center,
+- the **cost per frame** — vision tokens, compute/energy, latency — all dropping as you spend fewer tokens,
+- an **event-confidence vs cost** curve (the sweet spot is the fewest tokens past the confidence elbow),
+- and the caption — "what the model saw".
 
-with an **accuracy-vs-budget curve** behind it showing where quality holds and where it drops off.
+Honesty up front: in **simulated** mode the event + confidence are an *illustrative fine-tuned target*. Click **Use the live model** and the raw LFM2.5-VL-450M (on Modal) returns valid JSON but a **noisy** event/confidence — locking those in is a fine-tune. Vision-token counts are exact and compute/memory/energy scale with them.
 
 ---
 
@@ -27,7 +28,9 @@ with an **accuracy-vs-budget curve** behind it showing where quality holds and w
    ```
 3. **Open [http://localhost:8000](http://localhost:8000).** The page detects the running server and switches to the **LIVE MODEL** automatically — in Chrome on a Mac, and in any other browser, with no configuration. Drop your own frames into `data/scenes/` to run the model on real footage.
 
-> The app is a single page: **`web/index.html`** is the entry point (the `index.html` at the repo root just redirects to it), and `server.py` serves it at `http://localhost:8000`. The public link above is the shareable **simulated** demo; the live model runs locally on your machine.
+**No install at all?** On the demo, click **"Use the live model"** to run the real model on a hosted **Modal** endpoint (cloud GPU) — see [`modal_app.py`](modal_app.py) (`modal deploy modal_app.py`). Real captions and token counts; it's a cloud GPU so the latency is cloud + network, **not** on-device, and it's opt-in (it only spins a GPU up when you ask, and scales to zero when idle).
+
+> The app is a single page: **`web/index.html`** is the entry point (the `index.html` at the repo root just redirects to it), and `server.py` serves it at `http://localhost:8000`. The public link above is the shareable **simulated** demo; the live model runs locally, or on Modal via the button.
 
 ---
 
@@ -47,7 +50,7 @@ The demo page is the same in both modes: it automatically uses the real model **
 2. Open `web/index.html` in any web browser — double-click it, or drag it into a browser window.
 3. Drag the slider. That's it.
 
-No Python, no server, no internet needed. A "SIMULATED" badge is shown so it's clear the numbers are illustrative. Until you add your own footage (see [Bring your own footage](#bring-your-own-footage)), each scene shows a styled placeholder frame — the slider, readouts, and curve all work regardless.
+No Python, no server, no internet needed. A "SIMULATED" badge is shown so it's clear the numbers are illustrative. The three scenes use real front-door frames that ship with the repo (public-domain — see [Bring your own footage](#bring-your-own-footage)); the slider, readouts, and curve all work with no setup.
 
 ---
 
@@ -95,16 +98,15 @@ Drag the slider — each move sends the current setting to the server, which run
 
 ## Bring your own footage
 
-The demo is built to run on **your** doorbell frames. It expects up to four scenes, each an image file in `data/scenes/`:
+The demo ships with **three real front-door frames** (public-domain, from one fixed camera — see [`data/scenes/SOURCES.md`](data/scenes/SOURCES.md)):
 
 ```
-data/scenes/package.jpg        # a package left on the step
-data/scenes/person.jpg         # a person at the door
-data/scenes/two-people.jpg     # two people
-data/scenes/empty-branch.jpg   # empty porch, a branch moving (the tricky one)
+data/scenes/package.jpg        # a box on the step
+data/scenes/small-parcel.jpg   # a small parcel at the door
+data/scenes/two-parcels.jpg    # a box + a small parcel
 ```
 
-Drop your frames in with those names (`.jpg` or `.png`) and reload the page — they appear automatically. Until then, each scene shows a clearly-marked placeholder. The scene descriptions and the accuracy curve shipped in simulated mode are **illustrative** and written for those four scene *types*; when you move to Mode B (or run the accuracy sweep in `data/`), the numbers come from your actual frames.
+They drive the three demo scenes. The token budget doesn't change *whether* the model sees the package — a 450M model gets these clear frames right at any budget — it changes the **per-frame cost** (fewer tokens → less compute, memory, energy, latency) and how confident/complete the read is. That framing was verified against the real model on Modal — see [`modal_app.py`](modal_app.py); detection/counting/OCR were too noisy on a 450M model to fake a clean "it breaks at low budget" story. Replace any of these (keep the filenames) with **your own** doorbell frames and reload. The event, confidence and cost curve in simulated mode are **illustrative**; in real-model mode the event comes from the actual model (and is where the fine-tune matters).
 
 ---
 
@@ -186,7 +188,7 @@ liquid-token-budget-slider/
 │   └── index.html
 ├── data/                        # doorbell scenes + labels for the accuracy curve
 │   ├── scenes.json              # scene definitions + illustrative per-budget data
-│   ├── scenes/                  # drop your footage here (package.jpg, person.jpg, ...)
+│   ├── scenes/                  # sample front-door frames (package/small-parcel/two-parcels) + SOURCES.md
 │   ├── rubric.md                # how accuracy is scored
 │   └── eval_sweep.py            # runs the real model over the labeled set → measured curve
 └── .venv/                       # the bundled Python environment (created in setup)

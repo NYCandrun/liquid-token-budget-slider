@@ -45,17 +45,15 @@ SERVER = "http://localhost:8000"
 DATA_DIR = Path(__file__).resolve().parent
 SCENES_DIR = DATA_DIR / "scenes"
 
-# Minimal built-in manifest: the four scene types the demo ships with. Replace /
+# Minimal built-in manifest: the three scene frames the demo ships with. Replace /
 # extend with your ~20–40 labeled frames (see data/rubric.md).
 LABELS = [
     {"scene": "package", "file": "package.jpg",
-     "label": "A parcel is on the porch step; no person present."},
-    {"scene": "person", "file": "person.jpg",
-     "label": "One person standing at the front door."},
-    {"scene": "two-people", "file": "two-people.jpg",
-     "label": "Two people at the door."},
-    {"scene": "empty-branch", "file": "empty-branch.jpg",
-     "label": "Empty porch; a tree branch is moving. No person or package."},
+     "label": "A cardboard box sits on the step in front of the blue door."},
+    {"scene": "small-parcel", "file": "small-parcel.jpg",
+     "label": "A small white parcel sits at the base of the blue door."},
+    {"scene": "two-parcels", "file": "two-parcels.jpg",
+     "label": "A cardboard box and a small parcel are on the step."},
 ]
 
 PROMPT = "Describe the scene in one sentence."

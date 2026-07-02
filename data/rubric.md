@@ -1,46 +1,36 @@
-# Accuracy rubric
+# Description-detail rubric
 
-Accuracy in this demo is **not** a live measurement — you cannot know the correct
-answer for an arbitrary live frame. It is measured once, ahead of time, over a small
-labeled set of doorbell frames with known answers, scored with the fixed rubric below.
-`eval_sweep.py` runs that sweep across every vision-token budget and writes the curve
-that the UI displays.
+The demo's curve is **description detail** vs. token budget — how complete and specific
+the model's caption is — **not** a pass/fail accuracy. We checked on the real model
+(see `../modal_app.py`): this 450M model gets the scene *right* at every budget on these
+clear frames; what the token budget changes is the level of **detail**. Detection,
+counting, and OCR were all too noisy to score as a clean accuracy curve (the model
+hallucinates label text and detects the tiny parcel inconsistently), so detail is the
+honest axis.
 
-> In the shipped **simulated** mode there is no sweep behind the curve — the curve is
-> **illustrative** (and labeled as such in the UI). Run `eval_sweep.py` on your own
-> footage to replace it with a measured curve.
+> In simulated mode the curve is **illustrative** (labeled as such in the UI). Run
+> `eval_sweep.py` on your own footage to replace it with a measured detail curve.
 
-## Scene types and their ground truth
+## Scenes and ground truth
 
-| scene id       | ground truth                                              | the hard part                          |
-|----------------|-----------------------------------------------------------|----------------------------------------|
-| `package`      | A parcel is on the porch step; no person present.         | easy — should hold even at low budgets |
-| `person`       | One person standing at the front door.                    | presence is easy; detail needs budget  |
-| `two-people`   | Two people at the door.                                   | **counting** — undercounts at low budget |
-| `empty-branch` | Empty porch; a tree branch is moving. No person/package.  | **false positives** — hallucinates a person at low budget |
+| scene id       | ground truth                                            | what the budget changes                |
+|----------------|---------------------------------------------------------|----------------------------------------|
+| `package`      | A cardboard box on the step in front of the blue door.  | coarse "a box on the step" → materials, colour, the plant beside it |
+| `small-parcel` | A small white parcel at the base of the blue door.      | "a white item" → "a small white padded parcel on the black doormat" |
+| `two-parcels`  | A cardboard box and a small parcel on the step.         | mentions the box; the small parcel + surroundings appear as detail rises |
 
-## Scoring (per frame, per budget)
+## Scoring detail (per frame, per budget)
 
-Each generated description is graded against the frame's label on three checks. A
-frame **passes** (counts as correct) only if all three hold; accuracy at a budget is
-the fraction of frames that pass at that budget.
-
-1. **Primary subject present / absent correct** — the description asserts the right
-   thing exists (a package, a person, two people) or correctly asserts the porch is
-   empty. A false positive (claiming a person when there is none) fails here.
-2. **Count correct** — where the label has a count (0, 1, 2 people), the description's
-   count matches. "A person" for a two-person frame fails.
-3. **No contradicted detail** — any specific detail the description volunteers
-   (clothing, object type, action) must not contradict the label. Vagueness does not
-   fail this check; a wrong specific does.
-
-A grader (human, or an LLM judge given the label + rubric) applies checks 1–3 and
-records pass/fail. Keep the grader, prompt, and label set fixed across all budgets and
-all models so the comparison is held-constant.
+Score each description for **completeness**, not correctness (all are correct). Take a
+fixed checklist of salient, verifiable details per frame — e.g. for `two-parcels`:
+{box present, a second small parcel, on the brick step, blue door, potted plant} — and
+count how many the caption includes. Detail score = fraction of the checklist present.
+Any *contradicted* specific (a wrong colour or count) scores that item zero. Keep the
+checklist, prompt, judge, and frame set fixed across budgets and models so the
+comparison is held-constant.
 
 ## Labeled set
 
-Put labeled frames under `data/scenes/` (see the repo README, "Bring your own
-footage"). A defensible set is ~20–40 frames spread across the four scene types and a
-range of lighting/weather. Each frame needs a one-line label following the ground-truth
-column above.
+Put frames under `data/scenes/` (see the repo README, "Bring your own footage"), each
+with a detail checklist. A defensible set is ~20–40 frames across the three scene types
+and a range of lighting/weather.

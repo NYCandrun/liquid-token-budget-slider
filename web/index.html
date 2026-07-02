@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Token-Budget Slider · LFM2.5-VL-450M</title>
+<title>Camera → event, on a budget · LFM2.5-VL-450M</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
     --violet-700:#5B1CCC; --violet-600:#7C3AED; --violet-500:#9866F6; --violet-400:#AC8DFF;
     --wash:#F2ECFF; --grad:linear-gradient(90deg,#5B1CCC 0%,#7C3AED 50%,#9866F6 100%);
     --success:#16A34A; --warning:#D97706; --danger:#DC2626;
-    --radius:12px;
+    --radius:12px; --r-md:8px;
     --serif:"Newsreader","Iowan Old Style",Palatino,Georgia,ui-serif,serif;
     --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     --tech:"Chakra Petch",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -34,13 +34,14 @@
   .eyebrow::before{content:"";width:7px;height:7px;background:currentColor;display:inline-block}
   .eyebrow.violet{color:var(--violet-600)}
   .grad-bar{height:4px;width:104px;background:var(--grad);border-radius:999px;margin-bottom:16px}
+  .mut{color:var(--ink-400);text-transform:none;letter-spacing:0;font-weight:400}
 
   /* header */
   header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px}
   .logo{display:block;color:var(--ink-900);line-height:0;margin-bottom:18px}
   .logo svg{height:26px;width:auto;display:block;fill:currentColor}
   .hleft h1{font-size:34px;margin:10px 0 7px}
-  .hleft .tagline{font-size:14px;color:var(--ink-500);margin:0;max-width:56ch}
+  .hleft .tagline{font-size:14px;color:var(--ink-500);margin:0;max-width:62ch}
   .badge{font-family:var(--tech);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
     padding:7px 13px;border-radius:999px;border:1px solid var(--rule);white-space:nowrap}
   .badge .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:7px;vertical-align:middle}
@@ -78,29 +79,46 @@
   .gt{margin:12px 2px 0;font-size:.82rem;color:var(--ink-500)}
   .gt b{color:var(--ink-900);font-weight:600}
 
-  /* panel */
-  .readouts{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
-  .metric .k{font-family:var(--tech);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:3px}
-  .metric.big{flex:0 0 auto}
-  .metric.big .v{font-family:var(--serif);font-size:3rem;font-weight:400;line-height:1;letter-spacing:-.03em;color:var(--ink-900)}
-  .metric.big .u{display:inline;font-family:var(--tech);font-size:1rem;color:var(--ink-500);font-weight:500;margin-left:4px}
-  .metric.big .sub{font-size:.7rem;color:var(--ink-400);font-family:var(--sans);margin-top:6px}
-  .metric .v{font-family:var(--tech);font-size:1.6rem;font-weight:600;color:var(--ink-900)}
-  .metric.tok{padding-left:16px;border-left:1px solid var(--rule)}
-  .metric.tok .sub{font-size:.7rem;color:var(--ink-400);font-family:var(--sans);margin-top:2px}
+  /* event card (headline) */
+  .evhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+  .evk{font-family:var(--tech);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500)}
+  .evmode{font-family:var(--tech);font-size:.62rem;letter-spacing:.03em;color:var(--warning);white-space:nowrap}
+  .event{font-family:var(--tech);font-size:14px;line-height:1.6;margin:0;background:var(--surface-50);
+    border:1px solid var(--rule);border-radius:var(--r-md);padding:14px 16px;color:var(--ink-900);
+    white-space:pre;overflow-x:auto}
+  .event .ek{color:var(--ink-500)} .event .es{color:var(--violet-600)}
+  .event .en{color:var(--ink-900);font-weight:600} .event .ep{color:var(--ink-400)}
+  .evfoot{font-family:var(--tech);font-size:.7rem;color:var(--ink-500);margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+  .evfoot b{color:var(--ink-900)}
+  .evflag{color:var(--warning)}
 
-  .desc{margin-top:18px}
-  .desc .k{font-family:var(--tech);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .desc p{margin:0;font-size:1rem;min-height:2.9em;color:var(--ink-900)}
-  .pill{font-family:var(--tech);font-size:.66rem;font-weight:600;letter-spacing:.02em;padding:3px 9px;border-radius:999px;text-transform:none}
-  .pill.ok{background:var(--wash);color:var(--violet-700);border:1px solid var(--violet-400)}
-  .pill.bad{background:#FDECEC;color:var(--danger);border:1px solid #F3C6C6}
+  /* cost per frame */
+  .cost{margin-top:20px}
+  .cost > .ck{font-family:var(--tech);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:12px}
+  .costgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:end}
+  .cm .cmk{font-family:var(--tech);font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin-bottom:5px}
+  .cm .cmv{font-family:var(--serif);font-size:2rem;line-height:1;color:var(--ink-900);letter-spacing:-.02em}
+  .cm .cmv .u{font-family:var(--tech);font-size:.72rem;color:var(--ink-500);margin-left:3px;font-weight:400}
+  .cm .cmbar{height:6px;border-radius:3px;background:var(--rule);margin-top:9px;overflow:hidden}
+  .cm .cmbar i{display:block;height:100%;background:var(--grad);border-radius:3px;transition:width .18s}
+  .cm .sub{font-size:.66rem;color:var(--ink-400);margin-top:6px}
+  .costnote{font-size:.78rem;color:var(--ink-500);margin-top:14px;line-height:1.5}
 
+  /* chart */
   .chart{margin-top:20px}
   .chart .k{font-family:var(--tech);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
   .chart .k .muted{font-size:.62rem;color:var(--warning);text-transform:none;letter-spacing:.02em}
   #curve svg{width:100%;height:auto;display:block}
-  #curve text{font-family:var(--tech)}   /* var() is ignored in SVG attributes; set it via CSS */
+  #curve text{font-family:var(--tech)}
+  .legend2{display:flex;gap:16px;margin-top:8px;font-family:var(--tech);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-500)}
+  .legend2 span{display:inline-flex;align-items:center;gap:7px}
+  .legend2 i{width:15px;border-top:2px solid;display:inline-block}
+  .legend2 .dotv{border-color:var(--violet-600)}
+  .legend2 .dotg{border-top-style:dashed;border-color:var(--ink-400)}
+
+  .desc{margin-top:18px}
+  .desc .k{font-family:var(--tech);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:6px}
+  .desc p.descsm{margin:0;font-size:.88rem;color:var(--ink-500);min-height:2.4em}
 
   /* controls */
   .controls{margin-top:18px}
@@ -128,6 +146,13 @@
     border:1px solid var(--rule);border-radius:8px;padding:7px 11px}
   .devnote{font-size:.78rem;color:var(--ink-500);flex:1 1 240px;min-width:200px}
   .devnote b{color:var(--violet-700);font-weight:600}
+  .liverow{margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+  .livebtn{font-family:var(--sans);font-size:.84rem;font-weight:600;cursor:pointer;background:var(--violet-600);
+    color:#fff;border:1px solid var(--violet-600);border-radius:999px;padding:9px 18px;white-space:nowrap;transition:.15s}
+  .livebtn:hover{background:var(--violet-700);border-color:var(--violet-700)}
+  .livebtn:disabled{opacity:.7;cursor:default}
+  .livenote{font-size:.74rem;color:var(--ink-500);flex:1 1 300px;min-width:220px}
+  .livenote b{color:var(--ink-900)}
 
   footer{margin-top:28px;border-top:1px solid var(--rule);padding-top:18px;font-size:.8rem;color:var(--ink-500)}
   footer h4{margin:0 0 7px;font-family:var(--tech);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-900);font-weight:600}
@@ -159,9 +184,9 @@
         </svg>
       </span>
       <div class="grad-bar"></div>
-      <p class="eyebrow violet">LFM2.5-VL-450M · on-device vision-language</p>
-      <h1>Token-Budget <span class="serif-accent">Slider</span></h1>
-      <p class="tagline">Drag to trade detail for speed — watch tokens, latency and accuracy move together.</p>
+      <p class="eyebrow violet">LFM2.5-VL-450M · camera as a sensor</p>
+      <h1>One frame → one <span class="serif-accent">event</span>, on a budget</h1>
+      <p class="tagline">The camera emits a structured event a control loop can act on. Fewer vision tokens = less compute, memory and energy per frame — so drag to spend the <b>fewest tokens that still gets the event</b>.</p>
     </div>
     <div id="modeBadge" class="badge sim"><span class="dot"></span>SIMULATED</div>
   </header>
@@ -170,42 +195,47 @@
     <!-- STAGE -->
     <section class="card">
       <div class="frame">
-        <img id="sceneImg" class="hidden" alt="doorbell scene" />
+        <img id="sceneImg" class="hidden" alt="front-door camera frame" />
         <div id="placeholder" class="placeholder">
           <div class="ph-ico">🎞️</div>
           <div><b id="phLabel">Scene</b></div>
           <div>Drop your frame at<br><code id="phPath">data/scenes/…</code></div>
-          <div style="font-size:.75rem">then reload — the slider, readouts &amp; curve work either way</div>
+          <div style="font-size:.75rem">then reload — the slider, event &amp; cost work either way</div>
         </div>
-        <div id="coarseCap" class="coarsecap">coarsened — illustration of a lower budget</div>
+        <div id="coarseCap" class="coarsecap">coarsened — fewer vision tokens</div>
       </div>
       <div class="tabs" id="sceneTabs"></div>
-      <p class="gt"><b>Ground truth:</b> <span id="groundTruth"></span></p>
+      <p class="gt"><b>In frame:</b> <span id="groundTruth"></span></p>
     </section>
 
     <!-- PANEL -->
     <section class="card">
-      <div class="readouts">
-        <div class="metric big">
-          <div class="k">Latency</div>
-          <div><span class="v" id="latVal">–</span><span class="u">ms</span></div>
-          <div class="sub" id="latSub">illustrative</div>
-        </div>
-        <div class="metric tok">
-          <div class="k">Vision tokens</div>
-          <div class="v" id="tokVal">–</div>
-          <div class="sub" id="tokSub">used for this frame</div>
-        </div>
+      <div class="evhead">
+        <span class="evk">Event → the control loop</span>
+        <span class="evmode" id="evMode">illustrative · fine-tuned target</span>
       </div>
+      <pre class="event" id="eventCard"></pre>
+      <div class="evfoot"><b id="evByte">~58 B</b> · a structured event your loop acts on directly<span class="evflag" id="evFlag"></span></div>
 
-      <div class="desc">
-        <div class="k">Model description <span id="correctPill" class="pill"></span></div>
-        <p id="descVal">…</p>
+      <div class="cost">
+        <div class="ck">Cost per frame <span class="mut">— set by the vision-token budget</span></div>
+        <div class="costgrid">
+          <div class="cm"><div class="cmk">Vision tokens</div><div class="cmv" id="tokVal">–</div></div>
+          <div class="cm"><div class="cmk">Compute · energy</div><div class="cmv" id="costPct">–</div><div class="cmbar"><i id="costBar"></i></div></div>
+          <div class="cm"><div class="cmk">Latency</div><div class="cmv"><span id="latVal">–</span><span class="u">ms</span></div><div class="sub" id="latSub">illustrative</div></div>
+        </div>
+        <div class="costnote">Compute, activation memory and energy per frame all scale with the vision-token budget — drag left to spend less on every frame. <span id="tokSub" class="mut"></span></div>
       </div>
 
       <div class="chart">
-        <div class="k"><span>Accuracy vs budget</span><span class="muted" id="curveLabel">illustrative — see below</span></div>
+        <div class="k"><span>Event confidence &amp; cost vs budget</span><span class="muted" id="curveLabel">illustrative</span></div>
         <div id="curve"></div>
+        <div class="legend2"><span><i class="dotv"></i> event confidence</span><span><i class="dotg"></i> cost / frame</span></div>
+      </div>
+
+      <div class="desc">
+        <div class="k">What the model saw</div>
+        <p id="descVal" class="descsm">…</p>
       </div>
     </section>
   </main>
@@ -213,9 +243,9 @@
   <!-- CONTROLS -->
   <section class="controls card">
     <div class="sliderwrap">
-      <span class="end">fewer tokens<br>faster · coarser</span>
+      <span class="end">fewer tokens<br>cheaper · lighter</span>
       <input type="range" id="slider" min="0" max="7" step="1" value="6" aria-label="vision-token budget" />
-      <span class="end r">more tokens<br>slower · sharper</span>
+      <span class="end r">more tokens<br>costlier · sharper</span>
     </div>
     <div class="ticks" id="ticks"></div>
     <div class="budgetline">Budget cap: <b id="budgetVal">256</b> vision tokens
@@ -226,24 +256,18 @@
       <select id="device"></select>
       <span class="devnote" id="devNote"></span>
     </div>
+    <div class="liverow">
+      <button id="liveBtn" class="livebtn">▶ Use the live model (Modal · cloud GPU)</button>
+      <span class="livenote">Runs the real LFM2.5-VL-450M on Modal. Real JSON &amp; token counts — but the raw model's event/confidence aren't yet reliable (that's the fine-tune), and latency is cloud + network, <b>not</b> on-device.</span>
+    </div>
   </section>
 
   <footer>
     <div class="cols">
       <div>
         <h4>What's real, what's illustrative</h4>
-        <p><b>Simulated mode</b> (this page, opened as a file): the descriptions, latency, token
-        counts and the accuracy curve are <b>illustrative</b> — believable stand-ins, not a measured
-        LFM2.5-VL benchmark. In <b>real-model mode</b> (served at <code>http://localhost:8000</code>
-        with <code>server.py</code> running) latency and token counts are measured live; accuracy still
-        comes from a labeled sweep (<code>data/eval_sweep.py</code> + <code>data/rubric.md</code>), never
-        from a single live frame. Latency shows the <b>shape</b> of the tradeoff on a laptop, not a
-        specific device's number.</p>
-        <p>The token budget is a <b>first-class, documented control</b> in LFM2.5-VL
-        (<code>min_image_tokens</code>/<code>max_image_tokens</code>, set at inference time, no
-        retraining). Some models of this size expose image-resolution controls; few surface a clean,
-        documented per-image token budget — so this isn't a unique-in-the-world knob, just an unusually
-        direct one.</p>
+        <p>The <b>event</b> and its confidence in <b>simulated</b> mode are an <b>illustrative target</b> — what a model <em>fine-tuned</em> for your event taxonomy would emit. Click <b>Use the live model</b> and the raw LFM2.5-VL-450M runs on Modal: it returns structurally-valid JSON, but the event label and confidence are <b>not yet reliable</b> — locking those in is the fine-tune. Vision-token counts are exact; <b>compute, memory and energy per frame scale with them</b> (modeled). Latency is real in live mode (cloud GPU + network, not on-device) and illustrative in simulated mode.</p>
+        <p>The token budget is a first-class control in LFM2.5-VL (<code>max_image_tokens</code>, set per inference, no retraining). Fewer tokens → less to encode and prefill → less compute, memory and energy — the lever for fitting a camera's perception into a device's power and latency envelope.</p>
       </div>
       <div>
         <h4>Token ↔ resolution (Liquid AI)</h4>
@@ -257,9 +281,9 @@
 
 <script>
 /* ------------------------------------------------------------------ *
- * Embedded data (mirror of data/scenes.json) so the page runs offline
- * by double-click — no fetch of local JSON, no external libraries.
- * Accuracy + latency values are ILLUSTRATIVE and labeled as such.
+ * Embedded data (mirror of data/scenes.json) — runs offline by double-click.
+ * The event + confidence are ILLUSTRATIVE (a fine-tuned target); the token
+ * count is exact and compute/memory/energy scale with it. Labeled in the UI.
  * ------------------------------------------------------------------ */
 const DATA = {
   model: {
@@ -279,112 +303,139 @@ const DATA = {
     ]
   },
   latency: { base: 220, perToken: 0.9, quad: 0.00025 },
+  cost: { floor: 40 },   // fixed per-frame overhead (token-equivalent) for compute/energy/memory
   devices: [
     { id:"laptop", label:"This Mac · MPS", factor:1.0, tag:"shape",     note:"Reference laptop. Shows the <b>shape</b> of the tradeoff, not a device's number." },
     { id:"jetson", label:"Jetson Orin Nano", factor:2.2, tag:"est.",    note:"Estimate. Runs on the board's CPU/GPU via PyTorch — <b>not</b> its NPU." },
     { id:"pi5",    label:"Raspberry Pi 5 · CPU", factor:6.0, tag:"est.", note:"Estimate. CPU only — no accelerator." },
     { id:"npu",    label:"Phone-class NPU", factor:0.5, tag:"projected", note:"<b>Projected.</b> Needs a vendor runtime; this transformers build never touches the NPU." }
   ],
-  prompt: "Describe the scene in one sentence.",
-  failureHint: { "two-people":"undercounts — reads as one person", "empty-branch":"false positive — no one is actually there" },
+  // Real-mode prompt: ask the model for the structured event directly.
+  eventPrompt: 'You are a home-camera event detector. Look at the front doorstep and respond with ONLY a JSON object and nothing else: {"event":"<snake_case>","where":"<location>","conf":<0.0-1.0>}.',
   scenes: [
-    { id:"package", label:"Package on step", gt:"A parcel is on the porch step; no person present.", off:0,
+    { id:"package", label:"Box on step", gt:"A cardboard box on the step in front of the blue door.", off:0,
+      event:{ event:"package_placed", where:"front_door" },
       levels:[
-        {c:true,a:.80,d:"Something is sitting on the porch."},
-        {c:true,a:.85,d:"An object is on the step near the door."},
-        {c:true,a:.89,d:"A box or parcel is on the porch step."},
-        {c:true,a:.92,d:"A cardboard package is sitting on the top step."},
-        {c:true,a:.94,d:"A cardboard box is on the top step, just left of the door."},
-        {c:true,a:.96,d:"A medium cardboard package sits on the top step, to the left of the welcome mat."},
-        {c:true,a:.97,d:"A medium cardboard parcel sits on the top step, left of the mat; a shipping label is visible on top."},
-        {c:true,a:.98,d:"A medium cardboard parcel sits on the top step, left of the welcome mat, a shipping label facing up; no person is in frame."}
+        {conf:.60,d:"A box on the step by a door."},
+        {conf:.70,d:"A cardboard box on the step next to a blue door."},
+        {conf:.78,d:"A cardboard box sits on the brick step by the blue door."},
+        {conf:.85,d:"A cardboard box on the brick step in front of a blue door, near a potted plant."},
+        {conf:.90,d:"A cardboard delivery box on the brick step by the blue front door, beside a potted plant."},
+        {conf:.93,d:"A brown cardboard box on the red-brick step in front of the blue door, a potted plant to the right."},
+        {conf:.94,d:"A cardboard delivery box with a small white box on top, on the brick step before the blue door."},
+        {conf:.95,d:"A medium cardboard delivery box with a small white box on top rests on the red-brick step in front of the blue front door, a leafy potted plant beside it."}
       ]},
-    { id:"person", label:"Person at door", gt:"One person standing at the front door.", off:10,
+    { id:"small-parcel", label:"Small parcel", gt:"A small white parcel at the base of the blue door.", off:-5,
+      event:{ event:"package_placed", where:"front_door" },
       levels:[
-        {c:true,a:.70,d:"A person may be near the door."},
-        {c:true,a:.78,d:"A person is at the door."},
-        {c:true,a:.84,d:"A person is standing at the front door."},
-        {c:true,a:.89,d:"One person stands at the front door, facing it."},
-        {c:true,a:.92,d:"One adult stands at the front door, facing the door, a hand near the handle."},
-        {c:true,a:.94,d:"One adult in a dark jacket stands at the front door, facing it."},
-        {c:true,a:.95,d:"One adult in a dark jacket stands at the door, facing it, appears to be pressing the doorbell."},
-        {c:true,a:.96,d:"A single adult in a dark jacket stands at the front door, facing it, a hand raised toward the doorbell; no package visible."}
+        {conf:.38,d:"A white item by a blue door."},
+        {conf:.48,d:"A small white box on the step by the blue door."},
+        {conf:.58,d:"A small white parcel near the base of the blue door."},
+        {conf:.68,d:"A small white parcel on the mat at the foot of the blue door."},
+        {conf:.77,d:"A small white parcel on a dark doormat at the base of the blue door, brick walkway."},
+        {conf:.84,d:"A small white padded parcel on the doormat at the foot of the blue door, a potted plant nearby."},
+        {conf:.89,d:"A small white padded envelope on the black doormat at the base of the blue door, red-brick walkway."},
+        {conf:.92,d:"A small white padded parcel sits on the black doormat at the foot of the blue front door, beside a leafy potted plant and a red-brick walkway."}
       ]},
-    { id:"two-people", label:"Two people", gt:"Two people at the door.", off:25,
+    { id:"two-parcels", label:"Two parcels", gt:"A cardboard box and a small parcel on the step.", off:25,
+      event:{ event:"packages_placed", where:"front_door" },
       levels:[
-        {c:false,a:.45,d:"A person is at the door."},
-        {c:false,a:.58,d:"One, possibly two people near the door."},
-        {c:true, a:.78,d:"Two people appear to be at the door."},
-        {c:true, a:.86,d:"Two people stand at the front door."},
-        {c:true, a:.90,d:"Two adults stand at the front door, side by side."},
-        {c:true, a:.93,d:"Two adults stand at the front door, one slightly behind the other."},
-        {c:true, a:.94,d:"Two adults at the door; one in front facing the door, one behind holding a phone."},
-        {c:true, a:.95,d:"Two adults at the front door — one in a light top facing the door, a second in darker clothing standing just behind to the right."}
-      ]},
-    { id:"empty-branch", label:"Empty porch", gt:"Empty porch; a tree branch is moving. No person or package.", off:-5,
-      levels:[
-        {c:false,a:.40,d:"A person appears to be standing near the door."},
-        {c:false,a:.50,d:"Someone may be at the edge of the porch."},
-        {c:false,a:.62,d:"Possibly a figure near the railing, or foliage."},
-        {c:true, a:.82,d:"The porch looks empty; some movement at the edge of the frame."},
-        {c:true, a:.89,d:"The porch is empty; a plant or branch is moving near the railing."},
-        {c:true, a:.93,d:"The porch is empty; a tree branch is swaying at the left edge of the frame."},
-        {c:true, a:.95,d:"No person on the porch; a tree branch moves at the left edge, casting a shifting shadow."},
-        {c:true, a:.96,d:"The porch is empty — no person or package. A tree branch sways at the left edge of the frame, and its shadow moves across the step."}
+        {conf:.45,d:"A box on the step by a door."},
+        {conf:.55,d:"A cardboard box on the step next to the blue door."},
+        {conf:.64,d:"A cardboard box on the brick step by the blue door."},
+        {conf:.73,d:"A cardboard box on the brick step in front of the blue door, a small item beside it."},
+        {conf:.81,d:"A cardboard box with a small white parcel beside it on the brick step by the blue door."},
+        {conf:.87,d:"A cardboard box and a small white parcel on the red-brick step in front of the blue door."},
+        {conf:.90,d:"A cardboard delivery box with a small white parcel to its right on the brick step, blue door behind."},
+        {conf:.92,d:"A cardboard delivery box and a small white padded parcel rest on the red-brick step in front of the blue front door, beside a leafy potted plant."}
       ]}
   ]
 };
 
 const STOPS = DATA.model.budget_stops;
 const $ = (id) => document.getElementById(id);
-
-const state = { scene: 0, budget: 6, device: 0, mode: "sim", real: null };
+const state = { scene: 0, budget: 6, device: 0, mode: "sim" };
 
 /* ---------- illustrative latency model ---------- */
 function latencyMs(scene, idx){
-  const t = STOPS[idx];
-  const L = DATA.latency;
+  const t = STOPS[idx], L = DATA.latency;
   const raw = L.base + L.perToken * t + L.quad * t * t + scene.off;
   const factor = DATA.devices[state.device].factor;
-  // deterministic ±2.5% wobble so re-renders don't flicker
-  const jitter = 1 + 0.025 * Math.sin(state.scene * 2.3 + idx * 1.7);
+  const jitter = 1 + 0.025 * Math.sin(state.scene * 2.3 + idx * 1.7);  // deterministic, no flicker
   return Math.round(raw * factor * jitter);
 }
 
-/* ---------- accuracy curve (inline SVG, no deps) ---------- */
+/* ---------- cost model: per-frame compute/energy ∝ vision tokens (+ fixed floor) ---------- */
+function costPct(t){ const f = DATA.cost.floor, mx = STOPS[STOPS.length-1]; return Math.round(100*(f+t)/(f+mx)); }
+function renderCost(tokens){
+  $("tokVal").textContent = tokens;
+  const p = costPct(tokens);
+  $("costPct").innerHTML = p + "<span class='u'>%</span>";
+  $("costBar").style.width = p + "%";
+}
+
+/* ---------- the structured event card ---------- */
+function eventHTML(ev, conf){
+  const c = (typeof conf === "number") ? conf.toFixed(2) : conf;
+  return '<span class="ep">{</span>\n'
+    + '  <span class="ek">"event"</span><span class="ep">:</span> <span class="es">"' + ev.event + '"</span><span class="ep">,</span>\n'
+    + '  <span class="ek">"where"</span><span class="ep">:</span> <span class="es">"' + ev.where + '"</span><span class="ep">,</span>\n'
+    + '  <span class="ek">"conf"</span><span class="ep"> :</span>  <span class="en">' + c + '</span>\n'
+    + '<span class="ep">}</span>';
+}
+function renderEvent(scene, idx){       // simulated: the clean, fine-tuned target
+  const conf = scene.levels[idx].conf;
+  $("eventCard").innerHTML = eventHTML(scene.event, conf);
+  $("evByte").textContent = "~" + JSON.stringify({event:scene.event.event, where:scene.event.where, conf:+conf.toFixed(2)}).length + " B";
+  $("evMode").textContent = "illustrative · fine-tuned target";
+  $("evMode").style.color = "var(--warning)";
+  $("evFlag").textContent = "";
+}
+function renderEventReal(raw){          // live: the raw model's actual (noisy) attempt
+  let txt = String(raw||"").trim().replace(/^```(?:json)?\s*/i,"").replace(/\s*```$/,"").trim();
+  let ev = null;
+  try { ev = JSON.parse(txt); } catch(e){
+    const m = txt.match(/\{[\s\S]*\}/); if(m){ try{ ev = JSON.parse(m[0]); }catch(_){} }
+  }
+  if(ev && typeof ev === "object"){
+    const conf = (ev.conf!=null && !isNaN(+ev.conf)) ? +ev.conf : "—";
+    $("eventCard").innerHTML = eventHTML({event: ev.event ?? "?", where: ev.where ?? "?"}, conf);
+    $("evByte").textContent = "~" + JSON.stringify(ev).length + " B";
+  } else {
+    $("eventCard").textContent = raw;   // couldn't parse — show it raw
+    $("evByte").textContent = "~" + txt.length + " B";
+  }
+  $("evMode").textContent = "raw model output · " + (SERVER_KIND==="cloud" ? "Modal" : "local");
+  $("evMode").style.color = "var(--warning)";
+  $("evFlag").textContent = "· not yet reliable — fine-tune to lock the event + calibrate conf";
+}
+
+/* ---------- curve: event confidence (illustrative) vs cost/frame (∝ tokens) ---------- */
 function renderCurve(scene, idx){
-  const W=360,H=150,pL=32,pR=10,pT=10,pB=28;
+  const W=360,H=150,pL=32,pR=12,pT=10,pB=28;
   const pw=W-pL-pR, ph=H-pT-pB;
   const x=i=> pL + pw*(i/(STOPS.length-1));
-  const y=a=> pT + ph*(1-a);
+  const y=v=> pT + ph*(1-v);            // v in 0..1
   let g="";
   for(const gy of [0,.25,.5,.75,1]){
     g+=`<line x1="${pL}" y1="${y(gy)}" x2="${W-pR}" y2="${y(gy)}" stroke="#E8E8E8" stroke-width="1"/>`;
     g+=`<text x="${pL-6}" y="${y(gy)+3}" text-anchor="end" font-size="9" fill="#A1A1AA">${Math.round(gy*100)}</text>`;
   }
-  // breakdown zone (levels where the model is wrong) — faint danger wash
-  let firstOk=scene.levels.findIndex(l=>l.c);
-  if(firstOk>0){
-    g+=`<rect x="${x(0)}" y="${pT}" width="${x(firstOk-0.5)-x(0)}" height="${ph}" fill="rgba(220,38,38,.06)"/>`;
-  }
-  const pts=scene.levels.map((l,i)=>`${x(i)},${y(l.a)}`).join(" ");
-  // soft violet area under the curve, then the violet line
-  g+=`<polygon points="${x(0)},${pT+ph} ${pts} ${x(STOPS.length-1)},${pT+ph}" fill="#7C3AED" opacity="0.07"/>`;
-  g+=`<polyline points="${pts}" fill="none" stroke="#7C3AED" stroke-width="2.5"/>`;
-  // current marker guide
+  // cost line (∝ tokens) — dashed gray
+  const costPts=STOPS.map((s,i)=>`${x(i)},${y(costPct(s)/100)}`).join(" ");
+  g+=`<polyline points="${costPts}" fill="none" stroke="#A1A1AA" stroke-width="2" stroke-dasharray="4 3"/>`;
+  // confidence line (illustrative) — violet with soft area
+  const confPts=scene.levels.map((l,i)=>`${x(i)},${y(l.conf)}`).join(" ");
+  g+=`<polygon points="${x(0)},${pT+ph} ${confPts} ${x(STOPS.length-1)},${pT+ph}" fill="#7C3AED" opacity="0.06"/>`;
+  g+=`<polyline points="${confPts}" fill="none" stroke="#7C3AED" stroke-width="2.5"/>`;
+  // current-budget marker + points on both lines
   g+=`<line x1="${x(idx)}" y1="${pT}" x2="${x(idx)}" y2="${pT+ph}" stroke="#AC8DFF" stroke-width="1" stroke-dasharray="3 3"/>`;
-  scene.levels.forEach((l,i)=>{
-    const col=l.c?"#7C3AED":"#DC2626";           // Liquid = violet; where it fails = danger
-    const r=i===idx?5.5:3;
-    if(i===idx) g+=`<circle cx="${x(i)}" cy="${y(l.a)}" r="9" fill="none" stroke="#5B1CCC" stroke-width="1.5"/>`;
-    g+=`<circle cx="${x(i)}" cy="${y(l.a)}" r="${r}" fill="${col}"/>`;
-  });
-  // x labels (every stop)
-  STOPS.forEach((s,i)=>{
-    const on=i===idx;
-    g+=`<text x="${x(i)}" y="${H-9}" text-anchor="middle" font-size="8.5" fill="${on?'#7C3AED':'#71717A'}" font-weight="${on?'700':'400'}">${s}</text>`;
-  });
-  $("curve").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="accuracy versus token budget">${g}</svg>`;
+  g+=`<circle cx="${x(idx)}" cy="${y(costPct(STOPS[idx])/100)}" r="4" fill="#A1A1AA"/>`;
+  g+=`<circle cx="${x(idx)}" cy="${y(scene.levels[idx].conf)}" r="9" fill="none" stroke="#5B1CCC" stroke-width="1.5"/>`;
+  g+=`<circle cx="${x(idx)}" cy="${y(scene.levels[idx].conf)}" r="5" fill="#7C3AED"/>`;
+  STOPS.forEach((s,i)=>{ const on=i===idx;
+    g+=`<text x="${x(i)}" y="${H-9}" text-anchor="middle" font-size="8.5" fill="${on?'#7C3AED':'#71717A'}" font-weight="${on?'700':'400'}">${s}</text>`; });
+  $("curve").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="event confidence and cost per frame versus token budget">${g}</svg>`;
 }
 
 /* ---------- image loading (footage or placeholder) ---------- */
@@ -393,64 +444,43 @@ function loadSceneImage(scene){
   $("phLabel").textContent=scene.label;
   $("phPath").textContent=`data/scenes/${scene.id}.jpg`;
   img.classList.add("hidden"); ph.style.display="flex";
-  const src=`../data/scenes/${scene.id}.jpg`;
   img.onload=()=>{ img.classList.remove("hidden"); ph.style.display="none"; };
   img.onerror=()=>{ img.classList.add("hidden"); ph.style.display="flex"; };
-  img.src=src;                 // resolves on file:// and when served (../ clamps to root)
+  img.src=`../data/scenes/${scene.id}.jpg`;   // resolves on file:// and when served
 }
 
-/* ---------- coarsening (CSS filter — origin-safe metaphor) ---------- */
+/* ---------- coarsening (CSS filter — fewer tokens = less the model resolves) ---------- */
 function applyCoarsen(idx){
   const img=$("sceneImg"), cap=$("coarseCap");
   const f=(STOPS.length-1-idx)/(STOPS.length-1);   // 1 at lowest budget → 0 at highest
-  const blur=(f*5).toFixed(2), contrast=(1-0.08*f).toFixed(3), sat=(1-0.15*f).toFixed(3);
-  img.style.filter=`blur(${blur}px) contrast(${contrast}) saturate(${sat})`;
+  img.style.filter=`blur(${(f*5).toFixed(2)}px) contrast(${(1-0.08*f).toFixed(3)}) saturate(${(1-0.15*f).toFixed(3)})`;
   cap.classList.toggle("show", f>0.01);
 }
 
 /* ---------- main render ---------- */
 function render(){
-  const scene=DATA.scenes[state.scene];
-  const idx=state.budget;
-  const lvl=scene.levels[idx];
-  const stop=STOPS[idx];
-
+  const scene=DATA.scenes[state.scene], idx=state.budget, lvl=scene.levels[idx], stop=STOPS[idx];
   $("groundTruth").textContent=scene.gt;
   $("budgetVal").textContent=stop;
   $("extTag").classList.toggle("show", DATA.model.extended.includes(stop));
 
-  // readouts (simulated values; real mode overwrites latency/tokens/desc)
   if(state.mode==="sim"){
+    renderEvent(scene, idx);
     $("latVal").textContent=latencyMs(scene,idx);
-    $("tokVal").textContent="≈ "+stop;
-    $("tokSub").textContent="cap = "+stop+" (illustrative)";
+    renderCost(stop);
     $("descVal").textContent=lvl.d;
-    setCorrect(lvl.c, scene.id);
   }
-
-  // coarsening + curve always reflect the budget
   applyCoarsen(idx);
   renderCurve(scene, idx);
-
-  // slider ticks highlight
   document.querySelectorAll("#ticks span").forEach((s,i)=>s.classList.toggle("on", i===idx));
-
-  // device note
   const dev=DATA.devices[state.device];
   $("devNote").innerHTML=`<b>${dev.tag}</b> — ${dev.note}`;
 
   if(state.mode==="real") scheduleInfer();
 }
 
-function setCorrect(ok, sceneId){
-  const pill=$("correctPill");
-  if(ok){ pill.className="pill ok"; pill.textContent="✓ matches ground truth"; }
-  else{ pill.className="pill bad"; pill.textContent="✗ "+(DATA.failureHint[sceneId]||"wrong"); }
-}
-
 /* ---------- build static UI ---------- */
 function buildUI(){
-  // scene tabs
   const tabs=$("sceneTabs");
   DATA.scenes.forEach((s,i)=>{
     const b=document.createElement("button");
@@ -460,90 +490,106 @@ function buildUI(){
       loadSceneImage(s); render(); };
     tabs.appendChild(b);
   });
-  // ticks
   $("ticks").innerHTML=STOPS.map(s=>`<span>${s}</span>`).join("");
-  // device select
   const sel=$("device");
   DATA.devices.forEach((d,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=`${d.label} (${d.tag})`; sel.appendChild(o); });
   sel.onchange=()=>{ state.device=+sel.value; render(); };
-  // facts + citations
   $("facts").innerHTML=DATA.model.token_resolution_examples.map(e=>`${e.resolution}px&nbsp;→&nbsp;<b style="color:#18181B">${e.tokens}</b>&nbsp;tokens`).join("<br>");
   $("cites").innerHTML=DATA.model.citations.map(c=>`· <a href="${c.url}" target="_blank" rel="noopener">${c.t}</a>`).join("<br>");
-  // slider
   const sl=$("slider"); sl.value=state.budget;
   sl.addEventListener("input",()=>{ state.budget=+sl.value; render(); });
+  const lb=$("liveBtn"); if(lb) lb.onclick=connectLive;
 }
 
-/* ---------- real-model mode (only when served over http) ---------- */
-let inferTimer=null, inferSeq=0;
-function baseURL(){ return location.origin; }         // served page → same origin
-function scheduleInfer(){
-  clearTimeout(inferTimer);
-  inferTimer=setTimeout(runInfer, 160);               // debounce drags
-}
+/* ---------- real-model mode ---------- */
+// Hosted model on Modal so the demo can run a live model on demand. Modal is a CLOUD GPU:
+// real JSON + real vision-token counts, but latency is cloud + network, NOT on-device. We do
+// NOT auto-connect on load (a cold start spins up a GPU — cost + ~40s); the hosted model is
+// opt-in via the button, while a same-origin local server (server.py) auto-connects.
+const MODEL_ENDPOINT = "https://jacobnikolau767--lfm2-vl-450m-demo-model-web.modal.run";
+let inferTimer=null, inferSeq=0, SERVER_BASE=null, SERVER_KIND=null;
+function baseURL(){ return SERVER_BASE; }
+function scheduleInfer(){ clearTimeout(inferTimer); inferTimer=setTimeout(runInfer, 160); }
+
 async function runInfer(){
   const scene=DATA.scenes[state.scene], idx=state.budget, seq=++inferSeq;
-  // Mark readouts in-progress immediately (before any await) so a stale sim/live
-  // value is never shown as if it were the current live measurement.
-  $("latVal").textContent="…"; $("tokVal").textContent="…"; $("tokSub").textContent="measuring…";
-  $("descVal").textContent="running the model…"; $("correctPill").className="pill"; $("correctPill").textContent="";
+  $("eventCard").textContent="running the model…";
+  $("latVal").textContent="…"; $("tokVal").textContent="…"; $("descVal").textContent="…"; $("evFlag").textContent="";
   const imgURL=`../data/scenes/${scene.id}.jpg`;
   let b64;
   try{
     const resp=await fetch(imgURL);
-    if(!resp.ok) throw new Error("no frame "+resp.status);   // 404 doesn't reject fetch → check explicitly
+    if(!resp.ok) throw new Error("no frame "+resp.status);   // 404 doesn't reject fetch → check
     const blob=await resp.blob();
     b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(blob); });
   }catch(e){
-    if(seq!==inferSeq) return;                                // superseded by a newer scene/drag
-    // no footage for this scene → fall back to illustrative for this frame
+    if(seq!==inferSeq) return;
+    renderEvent(scene, idx); $("latVal").textContent=latencyMs(scene,idx); renderCost(STOPS[idx]);
     $("descVal").textContent="(add "+scene.id+".jpg to data/scenes/ to run the real model on this scene)";
-    $("latVal").textContent=latencyMs(scene,idx); $("tokVal").textContent="≈ "+STOPS[idx];
-    $("tokSub").textContent="no frame — illustrative"; setCorrect(scene.levels[idx].c, scene.id);
     return;
   }
   try{
     const r=await fetch(baseURL()+"/infer",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({image_b64:b64, prompt:DATA.prompt, max_image_tokens:STOPS[idx]})});
+      body:JSON.stringify({image_b64:b64, prompt:DATA.eventPrompt, max_image_tokens:STOPS[idx]})});
     if(!r.ok) throw new Error("infer "+r.status);
     const j=await r.json();
-    if(seq!==inferSeq) return;                                // a newer drag superseded this
+    if(seq!==inferSeq) return;
+    renderEventReal(j.description);
     $("latVal").textContent=Math.round(j.latency_ms);
-    $("tokVal").textContent=j.vision_tokens;
-    $("tokSub").textContent="measured · "+j.device;
+    renderCost(j.vision_tokens);
     $("descVal").textContent=j.description;
-    // accuracy is not live-measurable → keep the labeled/illustrative pill off
-    $("correctPill").className="pill"; $("correctPill").textContent="";
   }catch(e){
-    if(seq!==inferSeq) return;                                // superseded → let the newer one win
-    setMode("sim"); render();                                 // server went away → drop back to simulated
+    if(seq!==inferSeq) return;
+    SERVER_BASE=null; SERVER_KIND=null; setMode("sim"); render();   // server went away → simulated
   }
 }
 
 function setMode(mode, device){
   state.mode=mode;
-  const b=$("modeBadge");
+  const b=$("modeBadge"), btn=$("liveBtn");
   if(mode==="real"){
-    b.className="badge live"; b.innerHTML='<span class="dot"></span>LIVE MODEL'+(device?" · "+device:"");
-    $("curveLabel").textContent="illustrative — real curve via data/eval_sweep.py";
-    $("tokSub").textContent="measured";
-    $("latSub").textContent="measured on this laptop — shape, not a device number";
+    const cloud = SERVER_KIND==="cloud";
+    b.className="badge live";
+    b.innerHTML='<span class="dot"></span>'+(cloud?"LIVE · Modal":"LIVE · local")+(device?" · "+device:"");
+    $("curveLabel").textContent="confidence illustrative · cost ∝ tokens";
+    $("tokSub").textContent="measured · "+(device||"");
+    $("latSub").textContent = cloud ? "cloud GPU + network — not on-device"
+                                    : "measured locally — shape, not a device number";
+    if(btn) btn.style.display="none";
   }else{
     b.className="badge sim"; b.innerHTML='<span class="dot"></span>SIMULATED';
-    $("curveLabel").textContent="illustrative — see below";
+    $("curveLabel").textContent="illustrative";
+    $("tokSub").textContent="modeled";
     $("latSub").textContent="illustrative";
+    if(btn){ btn.style.display=""; btn.disabled=false; btn.textContent="▶ Use the live model (Modal · cloud GPU)"; }
   }
 }
 
-async function initMode(){
-  // Only probe when the page is served over http(s); on file:// stay simulated
-  // (a cross-origin probe would just log a CORS error and always fail).
-  if(!location.protocol.startsWith("http")){ setMode("sim"); return; }
+async function probe(base, timeoutMs){
   try{
-    const r=await fetch(baseURL()+"/health",{cache:"no-store"});
-    if(r.ok){ const j=await r.json(); setMode("real", j.device); render(); return; }
-  }catch(e){/* server not up → simulated */}
+    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(), timeoutMs||4000);
+    const r=await fetch(base+"/health",{cache:"no-store", signal:ctl.signal});
+    clearTimeout(t);
+    if(r.ok) return await r.json();
+  }catch(e){/* unreachable */}
+  return null;
+}
+async function initMode(){
+  // Auto-connect only to a same-origin local server (server.py at localhost:8000) — cheap,
+  // instant. The hosted Modal model is opt-in (button) so we don't cold-start a GPU per visitor.
+  if(location.protocol.startsWith("http")){
+    const h=await probe(location.origin, 3000);
+    if(h){ SERVER_BASE=location.origin; SERVER_KIND="local"; setMode("real", h.device); render(); return; }
+  }
   setMode("sim");
+}
+async function connectLive(){
+  const btn=$("liveBtn");
+  if(btn){ btn.disabled=true; btn.textContent="waking the model on Modal… (~40s cold start)"; }
+  const h=await probe(MODEL_ENDPOINT, 90000);   // first hit spins up a T4 + loads weights
+  if(h){ SERVER_BASE=MODEL_ENDPOINT; SERVER_KIND="cloud"; setMode("real", h.device); render(); }
+  else { SERVER_BASE=null; SERVER_KIND=null; setMode("sim");
+    if(btn){ btn.disabled=false; btn.textContent="▶ couldn't reach the model — retry"; } }
 }
 
 /* ---------- boot ---------- */

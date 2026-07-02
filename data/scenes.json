@@ -36,76 +36,63 @@
     { "id": "pi5", "label": "Raspberry Pi 5 · CPU", "factor": 6.0, "tag": "est.", "note": "Estimate. CPU only — no accelerator." },
     { "id": "npu", "label": "Phone-class NPU", "factor": 0.5, "tag": "projected", "note": "PROJECTED. Requires a vendor runtime; this transformers/PyTorch build does not touch the NPU." }
   ],
-  "prompt": "Describe the scene in one sentence.",
+  "caption_prompt": "Describe the scene in one sentence.",
+  "event_prompt": "You are a home-camera event detector. Look at the front doorstep and respond with ONLY a JSON object and nothing else: {\"event\":\"<snake_case>\",\"where\":\"<location>\",\"conf\":<0.0-1.0>}.",
+  "cost": { "_note": "Per-frame compute, activation memory and energy scale with the vision-token count (plus a fixed floor). Modeled/relative in the UI, not absolute joules. cost% = 100*(floor_tokens+tokens)/(floor_tokens+512).", "floor_tokens": 40 },
+  "_scene_note": "The demo emits a structured EVENT {event, where, conf} that a control loop acts on, and shows per-frame COST (compute/memory/energy scale with vision tokens). The event + 'conf' here are an ILLUSTRATIVE fine-tuned target; the raw 450M model (real mode via modal_app.py) returns valid JSON but noisy events — fine-tune to make them reliable. 'desc' is the caption the model would give ('what it saw'); 'conf' (0..1) is the illustrative event confidence, rising then plateauing with budget.",
   "scenes": [
     {
       "id": "package",
-      "label": "Package on step",
-      "ground_truth": "A parcel is on the porch step; no person present.",
+      "label": "Box on step",
+      "ground_truth": "A cardboard box on the step in front of the blue door.",
       "image": "data/scenes/package.jpg",
+      "event": { "event": "package_placed", "where": "front_door" },
       "latency_offset_ms": 0,
       "levels": [
-        { "budget": 64,  "tokens": 64,  "correct": true, "accuracy": 0.80, "desc": "Something is sitting on the porch." },
-        { "budget": 96,  "tokens": 96,  "correct": true, "accuracy": 0.85, "desc": "An object is on the step near the door." },
-        { "budget": 128, "tokens": 128, "correct": true, "accuracy": 0.89, "desc": "A box or parcel is on the porch step." },
-        { "budget": 160, "tokens": 160, "correct": true, "accuracy": 0.92, "desc": "A cardboard package is sitting on the top step." },
-        { "budget": 192, "tokens": 192, "correct": true, "accuracy": 0.94, "desc": "A cardboard box is on the top step, just left of the door." },
-        { "budget": 224, "tokens": 224, "correct": true, "accuracy": 0.96, "desc": "A medium cardboard package sits on the top step, to the left of the welcome mat." },
-        { "budget": 256, "tokens": 256, "correct": true, "accuracy": 0.97, "desc": "A medium cardboard parcel sits on the top step, left of the mat; a shipping label is visible on top." },
-        { "budget": 512, "tokens": 512, "correct": true, "accuracy": 0.98, "desc": "A medium cardboard parcel sits on the top step, left of the welcome mat, a shipping label facing up; no person is in frame." }
+        { "budget": 64,  "tokens": 64,  "conf": 0.60, "desc": "A box on the step by a door." },
+        { "budget": 96,  "tokens": 96,  "conf": 0.70, "desc": "A cardboard box on the step next to a blue door." },
+        { "budget": 128, "tokens": 128, "conf": 0.78, "desc": "A cardboard box sits on the brick step by the blue door." },
+        { "budget": 160, "tokens": 160, "conf": 0.85, "desc": "A cardboard box on the brick step in front of a blue door, near a potted plant." },
+        { "budget": 192, "tokens": 192, "conf": 0.90, "desc": "A cardboard delivery box on the brick step by the blue front door, beside a potted plant." },
+        { "budget": 224, "tokens": 224, "conf": 0.93, "desc": "A brown cardboard box on the red-brick step in front of the blue door, a potted plant to the right." },
+        { "budget": 256, "tokens": 256, "conf": 0.94, "desc": "A cardboard delivery box with a small white box on top, on the brick step before the blue door." },
+        { "budget": 512, "tokens": 512, "conf": 0.95, "desc": "A medium cardboard delivery box with a small white box on top rests on the red-brick step in front of the blue front door, a leafy potted plant beside it." }
       ]
     },
     {
-      "id": "person",
-      "label": "Person at door",
-      "ground_truth": "One person standing at the front door.",
-      "image": "data/scenes/person.jpg",
-      "latency_offset_ms": 10,
-      "levels": [
-        { "budget": 64,  "tokens": 64,  "correct": true, "accuracy": 0.70, "desc": "A person may be near the door." },
-        { "budget": 96,  "tokens": 96,  "correct": true, "accuracy": 0.78, "desc": "A person is at the door." },
-        { "budget": 128, "tokens": 128, "correct": true, "accuracy": 0.84, "desc": "A person is standing at the front door." },
-        { "budget": 160, "tokens": 160, "correct": true, "accuracy": 0.89, "desc": "One person stands at the front door, facing it." },
-        { "budget": 192, "tokens": 192, "correct": true, "accuracy": 0.92, "desc": "One adult stands at the front door, facing the door, a hand near the handle." },
-        { "budget": 224, "tokens": 224, "correct": true, "accuracy": 0.94, "desc": "One adult in a dark jacket stands at the front door, facing it." },
-        { "budget": 256, "tokens": 256, "correct": true, "accuracy": 0.95, "desc": "One adult in a dark jacket stands at the door, facing it, appears to be pressing the doorbell." },
-        { "budget": 512, "tokens": 512, "correct": true, "accuracy": 0.96, "desc": "A single adult in a dark jacket stands at the front door, facing it, a hand raised toward the doorbell; no package visible." }
-      ]
-    },
-    {
-      "id": "two-people",
-      "label": "Two people",
-      "ground_truth": "Two people at the door.",
-      "image": "data/scenes/two-people.jpg",
-      "latency_offset_ms": 25,
-      "breaks_below_budget": 128,
-      "levels": [
-        { "budget": 64,  "tokens": 64,  "correct": false, "accuracy": 0.45, "desc": "A person is at the door." },
-        { "budget": 96,  "tokens": 96,  "correct": false, "accuracy": 0.58, "desc": "One, possibly two people near the door." },
-        { "budget": 128, "tokens": 128, "correct": true,  "accuracy": 0.78, "desc": "Two people appear to be at the door." },
-        { "budget": 160, "tokens": 160, "correct": true,  "accuracy": 0.86, "desc": "Two people stand at the front door." },
-        { "budget": 192, "tokens": 192, "correct": true,  "accuracy": 0.90, "desc": "Two adults stand at the front door, side by side." },
-        { "budget": 224, "tokens": 224, "correct": true,  "accuracy": 0.93, "desc": "Two adults stand at the front door, one slightly behind the other." },
-        { "budget": 256, "tokens": 256, "correct": true,  "accuracy": 0.94, "desc": "Two adults at the door; one in front facing the door, one behind holding a phone." },
-        { "budget": 512, "tokens": 512, "correct": true,  "accuracy": 0.95, "desc": "Two adults at the front door — one in a light top facing the door, a second in darker clothing standing just behind to the right." }
-      ]
-    },
-    {
-      "id": "empty-branch",
-      "label": "Empty porch (branch)",
-      "ground_truth": "Empty porch; a tree branch is moving. No person or package.",
-      "image": "data/scenes/empty-branch.jpg",
+      "id": "small-parcel",
+      "label": "Small parcel",
+      "ground_truth": "A small white parcel at the base of the blue door.",
+      "image": "data/scenes/small-parcel.jpg",
+      "event": { "event": "package_placed", "where": "front_door" },
       "latency_offset_ms": -5,
-      "breaks_below_budget": 160,
       "levels": [
-        { "budget": 64,  "tokens": 64,  "correct": false, "accuracy": 0.40, "desc": "A person appears to be standing near the door." },
-        { "budget": 96,  "tokens": 96,  "correct": false, "accuracy": 0.50, "desc": "Someone may be at the edge of the porch." },
-        { "budget": 128, "tokens": 128, "correct": false, "accuracy": 0.62, "desc": "Possibly a figure near the railing, or foliage." },
-        { "budget": 160, "tokens": 160, "correct": true,  "accuracy": 0.82, "desc": "The porch looks empty; some movement at the edge of the frame." },
-        { "budget": 192, "tokens": 192, "correct": true,  "accuracy": 0.89, "desc": "The porch is empty; a plant or branch is moving near the railing." },
-        { "budget": 224, "tokens": 224, "correct": true,  "accuracy": 0.93, "desc": "The porch is empty; a tree branch is swaying at the left edge of the frame." },
-        { "budget": 256, "tokens": 256, "correct": true,  "accuracy": 0.95, "desc": "No person on the porch; a tree branch moves at the left edge, casting a shifting shadow." },
-        { "budget": 512, "tokens": 512, "correct": true,  "accuracy": 0.96, "desc": "The porch is empty — no person or package. A tree branch sways at the left edge of the frame, and its shadow moves across the step." }
+        { "budget": 64,  "tokens": 64,  "conf": 0.38, "desc": "A white item by a blue door." },
+        { "budget": 96,  "tokens": 96,  "conf": 0.48, "desc": "A small white box on the step by the blue door." },
+        { "budget": 128, "tokens": 128, "conf": 0.58, "desc": "A small white parcel near the base of the blue door." },
+        { "budget": 160, "tokens": 160, "conf": 0.68, "desc": "A small white parcel on the mat at the foot of the blue door." },
+        { "budget": 192, "tokens": 192, "conf": 0.77, "desc": "A small white parcel on a dark doormat at the base of the blue door, brick walkway." },
+        { "budget": 224, "tokens": 224, "conf": 0.84, "desc": "A small white padded parcel on the doormat at the foot of the blue door, a potted plant nearby." },
+        { "budget": 256, "tokens": 256, "conf": 0.89, "desc": "A small white padded envelope on the black doormat at the base of the blue door, red-brick walkway." },
+        { "budget": 512, "tokens": 512, "conf": 0.92, "desc": "A small white padded parcel sits on the black doormat at the foot of the blue front door, beside a leafy potted plant and a red-brick walkway." }
+      ]
+    },
+    {
+      "id": "two-parcels",
+      "label": "Two parcels",
+      "ground_truth": "A cardboard box and a small parcel on the step.",
+      "image": "data/scenes/two-parcels.jpg",
+      "event": { "event": "packages_placed", "where": "front_door" },
+      "latency_offset_ms": 25,
+      "levels": [
+        { "budget": 64,  "tokens": 64,  "conf": 0.45, "desc": "A box on the step by a door." },
+        { "budget": 96,  "tokens": 96,  "conf": 0.55, "desc": "A cardboard box on the step next to the blue door." },
+        { "budget": 128, "tokens": 128, "conf": 0.64, "desc": "A cardboard box on the brick step by the blue door." },
+        { "budget": 160, "tokens": 160, "conf": 0.73, "desc": "A cardboard box on the brick step in front of the blue door, a small item beside it." },
+        { "budget": 192, "tokens": 192, "conf": 0.81, "desc": "A cardboard box with a small white parcel beside it on the brick step by the blue door." },
+        { "budget": 224, "tokens": 224, "conf": 0.87, "desc": "A cardboard box and a small white parcel on the red-brick step in front of the blue door." },
+        { "budget": 256, "tokens": 256, "conf": 0.90, "desc": "A cardboard delivery box with a small white parcel to its right on the brick step, blue door behind." },
+        { "budget": 512, "tokens": 512, "conf": 0.92, "desc": "A cardboard delivery box and a small white padded parcel rest on the red-brick step in front of the blue front door, beside a leafy potted plant." }
       ]
     }
   ]
